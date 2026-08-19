@@ -29,7 +29,7 @@ export const TrailOverlandingHub: React.FC = () => {
               : 'text-gray-400 hover:text-white hover:bg-[#1b222d]'
           }`}
         >
-          <ShieldAlert className="w-4 h-4 text-amber-400" /> Glovebox Trail Rescue & Shim Logbook
+          <ShieldAlert className="w-4 h-4 text-amber-400" /> Glovebox Trail Rescue & Service Logbook
         </button>
         <button
           onClick={() => setSubTab('4wd-lube')}

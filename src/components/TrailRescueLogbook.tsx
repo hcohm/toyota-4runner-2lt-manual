@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   ShieldAlert,
   Sparkles,
-  Layers,
   Clock,
   Download,
-  Save,
   Plus,
   Trash2
 } from 'lucide-react';
@@ -80,14 +78,6 @@ const EMERGENCY_HACKS: EmergencyHack[] = [
   }
 ];
 
-interface ShimRecord {
-  cylinder: number;
-  intakeThicknessMm: string;
-  intakeLashMm: string;
-  exhaustThicknessMm: string;
-  exhaustLashMm: string;
-}
-
 interface ServiceLogEntry {
   id: string;
   date: string;
@@ -97,26 +87,8 @@ interface ServiceLogEntry {
 }
 
 export const TrailRescueLogbook: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'hacks' | 'logbook' | 'shims'>('hacks');
+  const [activeTab, setActiveTab] = useState<'hacks' | 'logbook'>('hacks');
   const [selectedHack, setSelectedHack] = useState<EmergencyHack>(EMERGENCY_HACKS[0]);
-
-  // Persistent Valve Shim Tracker
-  const [shimRecords, setShimRecords] = useState<ShimRecord[]>(() => {
-    const saved = localStorage.getItem('4runner_2lt_shims');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        // Fallback
-      }
-    }
-    return [
-      { cylinder: 1, intakeThicknessMm: '2.80', intakeLashMm: '0.25', exhaustThicknessMm: '2.95', exhaustLashMm: '0.45' },
-      { cylinder: 2, intakeThicknessMm: '2.85', intakeLashMm: '0.24', exhaustThicknessMm: '2.90', exhaustLashMm: '0.44' },
-      { cylinder: 3, intakeThicknessMm: '2.80', intakeLashMm: '0.26', exhaustThicknessMm: '2.95', exhaustLashMm: '0.46' },
-      { cylinder: 4, intakeThicknessMm: '2.85', intakeLashMm: '0.25', exhaustThicknessMm: '3.00', exhaustLashMm: '0.45' }
-    ];
-  });
 
   // Persistent Service Logs
   const [serviceLogs, setServiceLogs] = useState<ServiceLogEntry[]>(() => {
@@ -152,21 +124,6 @@ export const TrailRescueLogbook: React.FC = () => {
   const [newType, setNewType] = useState<string>('Oil & Filter Change (15W-40)');
   const [newNotes, setNewNotes] = useState<string>('');
 
-  const saveShims = () => {
-    localStorage.setItem('4runner_2lt_shims', JSON.stringify(shimRecords));
-  };
-
-  const updateShimField = (
-    cylinderIndex: number,
-    field: keyof ShimRecord,
-    val: string
-  ) => {
-    const updated = [...shimRecords];
-    updated[cylinderIndex] = { ...updated[cylinderIndex], [field]: val };
-    setShimRecords(updated);
-    localStorage.setItem('4runner_2lt_shims', JSON.stringify(updated));
-  };
-
   const addServiceLog = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newDate || !newOdo) return;
@@ -195,7 +152,6 @@ export const TrailRescueLogbook: React.FC = () => {
     const data = {
       vehicle: '1991 Toyota 4Runner / Hilux Surf 2L-T',
       exportedAt: new Date().toISOString(),
-      shims: shimRecords,
       serviceLogs: serviceLogs
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -216,15 +172,15 @@ export const TrailRescueLogbook: React.FC = () => {
             <div className="flex items-center gap-2 mb-1">
               <span className="badge-toyota">Offline Glovebox Companion</span>
               <span className="badge-spec flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-red-400" /> Trail Rescue & Maintenance Logbook
+                <Sparkles className="w-3 h-3 text-red-400" /> Trail Rescue & Maintenance History
               </span>
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
               <ShieldAlert className="w-6 h-6 text-red-500" />
-              Glovebox Trail Rescue & Digital Maintenance Log
+              Glovebox Trail Rescue & Vehicle Service Logbook
             </h2>
             <p className="text-sm text-gray-400 mt-1 max-w-3xl leading-relaxed">
-              Essential backcountry field bypass tricks for dead timer computers, burst heater cores, and solenoid jumps, plus a persistent maintenance logbook with valve shim thickness tracking.
+              Essential backcountry field bypass protocols for dead timer computers, burst heater cores, and solenoid jumps, plus a persistent maintenance service timeline.
             </p>
           </div>
 
@@ -232,27 +188,19 @@ export const TrailRescueLogbook: React.FC = () => {
           <div className="bg-[#12151a] p-1 rounded-lg border border-[#27303d] flex flex-wrap">
             <button
               onClick={() => setActiveTab('hacks')}
-              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+              className={`px-3.5 py-1.5 rounded text-xs font-mono font-bold transition-all ${
                 activeTab === 'hacks' ? 'bg-red-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
-              Emergency Hacks ({EMERGENCY_HACKS.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('shims')}
-              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
-                activeTab === 'shims' ? 'bg-red-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              Valve Shim Tracker (8 Valves)
+              Emergency Trail Hacks ({EMERGENCY_HACKS.length})
             </button>
             <button
               onClick={() => setActiveTab('logbook')}
-              className={`px-3 py-1.5 rounded text-xs font-mono font-bold transition-all ${
+              className={`px-3.5 py-1.5 rounded text-xs font-mono font-bold transition-all ${
                 activeTab === 'logbook' ? 'bg-red-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
-              Service Logbook ({serviceLogs.length})
+              Service History Logbook ({serviceLogs.length})
             </button>
           </div>
         </div>
@@ -330,92 +278,7 @@ export const TrailRescueLogbook: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: VALVE SHIM TRACKER */}
-      {activeTab === 'shims' && (
-        <div className="tech-panel p-6 bg-[#12151b] space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-[#252e3b]">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Layers className="w-5 h-5 text-purple-400" />
-                Installed Valve Shim Thickness Logbook (Cylinders 1 – 4)
-              </h3>
-              <p className="text-xs text-gray-400 mt-0.5">
-                Record the physical shim thicknesses currently installed on your 2L-T valvetrain to streamline future lash adjustments.
-              </p>
-            </div>
-
-            <button
-              onClick={saveShims}
-              className="px-3.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-mono text-xs font-bold flex items-center gap-1.5 transition-all shadow-md self-start sm:self-auto"
-            >
-              <Save className="w-3.5 h-3.5" /> Save Shim Specs
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {shimRecords.map((rec, idx) => (
-              <div key={rec.cylinder} className="p-4 bg-[#181d24] rounded-xl border border-[#2b3542] space-y-3">
-                <div className="text-xs font-mono font-bold text-white uppercase flex items-center justify-between">
-                  <span>Cylinder No. {rec.cylinder}</span>
-                  <span className="badge-spec text-[9px]">2 Valves</span>
-                </div>
-
-                {/* Intake Valve */}
-                <div className="space-y-1 text-xs font-mono">
-                  <span className="text-cyan-400 font-bold text-[10px] block">INTAKE VALVE:</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[9px] text-gray-500 block">Shim (mm):</label>
-                      <input
-                        type="text"
-                        value={rec.intakeThicknessMm}
-                        onChange={(e) => updateShimField(idx, 'intakeThicknessMm', e.target.value)}
-                        className="w-full bg-[#101317] border border-[#28323f] rounded px-2 py-1 text-white text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[9px] text-gray-500 block">Lash (mm):</label>
-                      <input
-                        type="text"
-                        value={rec.intakeLashMm}
-                        onChange={(e) => updateShimField(idx, 'intakeLashMm', e.target.value)}
-                        className="w-full bg-[#101317] border border-[#28323f] rounded px-2 py-1 text-emerald-400 text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Exhaust Valve */}
-                <div className="space-y-1 text-xs font-mono pt-2 border-t border-[#222b37]">
-                  <span className="text-amber-400 font-bold text-[10px] block">EXHAUST VALVE:</span>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <label className="text-[9px] text-gray-500 block">Shim (mm):</label>
-                      <input
-                        type="text"
-                        value={rec.exhaustThicknessMm}
-                        onChange={(e) => updateShimField(idx, 'exhaustThicknessMm', e.target.value)}
-                        className="w-full bg-[#101317] border border-[#28323f] rounded px-2 py-1 text-white text-xs"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[9px] text-gray-500 block">Lash (mm):</label>
-                      <input
-                        type="text"
-                        value={rec.exhaustLashMm}
-                        onChange={(e) => updateShimField(idx, 'exhaustLashMm', e.target.value)}
-                        className="w-full bg-[#101317] border border-[#28323f] rounded px-2 py-1 text-emerald-400 text-xs"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* TAB 3: SERVICE LOGBOOK */}
+      {/* TAB 2: SERVICE LOGBOOK */}
       {activeTab === 'logbook' && (
         <div className="space-y-6">
           {/* Add Entry Form */}
