@@ -177,6 +177,380 @@ export const PROCEDURES_DATA: Procedure[] = [
     ]
   },
   {
+    id: "front-wheel-bearings",
+    title: "Front Wheel Bearing Repack, Preload Adjustment & Spindle Locknut Protocol",
+    category: "Suspension & Brakes",
+    difficulty: "Intermediate",
+    estimatedTime: "2.5 Hours",
+    requiredSSTs: [
+      { number: "09607-10010", name: "54mm Octagonal Hub Spindle Socket", description: "Specialty thin-wall socket for Toyota front spindle nuts" },
+      { number: "09608-20012", name: "Cone Washer Drift & Snap Ring Pliers", description: "Extracts Aisin manual hub cone washers and spindle snap ring" },
+      { number: "Universal", name: "Spring Pull Scale (0 - 15 kg)", description: "Measures front wheel bearing rolling preload" }
+    ],
+    consumables: [
+      "High-Temperature NLGI No. 2 Lithium Complex Wheel Bearing Grease",
+      "Inner Spindle Grease Seals (Toyota 90311-62001)",
+      "Star Tab Lock Washers (Toyota 90215-42025)",
+      "Aisin Hub Paper Gaskets"
+    ],
+    overview: "Front wheel bearings on the LN130 IFS 4Runner require precise two-stage preload adjustment using a 54mm socket and spring scale to eliminate death wobble and prevent premature spindle bearing seizure.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Remove Brake Caliper & Aisin Hub Assembly",
+        instruction: "Support vehicle safely on jackstands. Unbolt 4-piston front brake caliper (2x 17mm bolts - 123 Nm) and hang with wire. Remove Aisin locking hub cover, axle snap ring, cone washers, and hub body.",
+        torqueCallout: "Caliper Mounting Bolts: 123 Nm (91 ft-lb)",
+        checkItem: "Caliper hung safely without straining rubber brake hose"
+      },
+      {
+        stepNumber: 2,
+        title: "Remove 54mm Spindle Locknuts & Rotor Hub",
+        instruction: "Flatten star lock washer tabs. Using 54mm SST socket, remove outer locknut, star lock washer, inner adjusting nut, and thrust washer. Slide brake rotor and wheel hub assembly off spindle snout.",
+        sstNumber: "09607-10010",
+        checkItem: "Inner and outer tapered roller bearings extracted"
+      },
+      {
+        stepNumber: 3,
+        title: "Clean, Inspect & Palm-Pack Bearings",
+        instruction: "Clean spindle, rotor hub cavity, and bearings in solvent. Inspect bearing rollers and races for pitting or blue thermal discoloration. Pack new NLGI 2 lithium complex grease through bearing cages until grease oozes completely through rollers. Drive in new inner grease seal flush with hub rim.",
+        checkItem: "Bearings 100% packed and new seal installed flush"
+      },
+      {
+        stepNumber: 4,
+        title: "Stage 1 Preload Seating Torque",
+        instruction: "Slide hub onto spindle. Install thrust washer and inner 54mm adjusting nut. Using 54mm socket, torque inner nut to 59 Nm (43 ft-lb) while rotating the rotor back and forth 5 times to seat the bearing rollers.",
+        torqueCallout: "Preload Seating: 59 Nm (43 ft-lb)",
+        checkItem: "Hub spun 5 revolutions during seating torque"
+      },
+      {
+        stepNumber: 5,
+        title: "Stage 2 Final Preload Adjustment",
+        instruction: "Loosen inner 54mm nut completely until finger-loose. Re-torque inner nut to 25 Nm (18 ft-lb). Turn hub back and forth several times.",
+        torqueCallout: "Inner Adjusting Nut: 25 Nm (18 ft-lb)"
+      },
+      {
+        stepNumber: 6,
+        title: "Install Star Lock Washer & Outer Locknut",
+        instruction: "Install star tab washer. Thread outer 54mm locknut and torque to 47 Nm (35 ft-lb). Check that hub spins smoothly without any lateral end play (0.00 mm).",
+        torqueCallout: "Outer 54mm Locknut: 47 Nm (35 ft-lb)"
+      },
+      {
+        stepNumber: 7,
+        title: "Spring Pull Scale Rolling Resistance Check",
+        instruction: "Hook spring scale to a wheel lug stud at 90 degrees. Pull steadily: The rolling frictional drag must be 2.8 – 5.7 kg (6.2 – 12.6 lbs). Bend one star tab inward over the inner nut and one tab outward over the outer nut.",
+        checkItem: "Spring pull force between 2.8 and 5.7 kg; lock tabs bent"
+      }
+    ]
+  },
+  {
+    id: "rear-diff-overhaul",
+    title: "Rear 8.0-inch Differential Third Member Setup (Backlash & Pinion Preload)",
+    category: "Drivetrain",
+    difficulty: "Master Mechanic",
+    estimatedTime: "5 - 7 Hours",
+    requiredSSTs: [
+      { number: "09556-30010", name: "Pinion Flange Holding Tool", description: "Holds rear companion flange during 196 Nm pinion nut torquing" },
+      { number: "09275-54011", name: "Dial Indicator with Magnetic Base", description: "Measures ring gear backlash (0.13–0.18 mm)" },
+      { number: "Universal", name: "Inch-Pound Beam Torque Wrench (0 - 30 in-lb)", description: "Measures pinion bearing starting rolling preload" }
+    ],
+    consumables: [
+      "Toyota OEM Crush Sleeve (Collapsible Spacer)",
+      "Rear Pinion Oil Seal (Toyota 90311-38047)",
+      "Toyota Gear Marking Compound / Prussian Blue",
+      "API GL-5 SAE 80W-90 Gear Oil (2.2 Liters)",
+      "High-Tack Permatex Ultra Grey RTV"
+    ],
+    overview: "Setting up the Toyota 8.0-inch rear differential third member requires precise collapsible crush sleeve compression, carrier bearing preload adjustment via side spanner rings, and ring-to-pinion backlash setting to ensure silent, vibration-free operation under heavy turbo torque.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Measure Starting Pinion Bearing Preload",
+        instruction: "With differential carrier assembly removed from housing, install pinion gear, front/rear bearings, new crush sleeve, and companion flange. Tighten 30mm pinion nut gradually until all end play disappears. Use inch-pound torque wrench to measure rotational drag: New Bearings = 1.0 – 1.6 Nm (8.7 – 13.9 in-lb) | Used Bearings = 0.5 – 0.8 Nm (4.3 – 6.9 in-lb).",
+        sstNumber: "09556-30010",
+        torqueCallout: "Pinion Nut: Tighten progressively up to 196 Nm (145 ft-lb) maximum",
+        warningAlert: "CRITICAL: Never overtighten the crush sleeve! If preload exceeds 1.6 Nm, you MUST discard the crush sleeve and install a brand new one."
+      },
+      {
+        stepNumber: 2,
+        title: "Install Differential Carrier & Bearing Caps",
+        instruction: "Place carrier into third member housing. Install side adjuster rings and bearing caps. Snug 4x 17mm bearing cap bolts to 20 Nm (do not final-torque yet).",
+        checkItem: "Side adjuster rings threaded in straight without cross-threading"
+      },
+      {
+        stepNumber: 3,
+        title: "Adjust Ring Gear Backlash (0.13 – 0.18 mm)",
+        instruction: "Mount magnetic base dial indicator with stem perpendicular to the drive side of a ring gear tooth. Lock the pinion flange. Rock the ring gear back and forth: Backlash must measure 0.13 – 0.18 mm (0.005 – 0.007 in). Turn the side adjuster spanner rings to shift the carrier left or right to achieve exact backlash.",
+        checkItem: "Backlash measured at 4 points around ring gear within 0.13-0.18mm"
+      },
+      {
+        stepNumber: 4,
+        title: "Set Carrier Bearing Preload & Torque Bearing Caps",
+        instruction: "Tighten both side adjuster rings evenly to apply carrier preload until total assembly rotational drag increases by 0.4 – 0.6 Nm (3.5 – 5.2 in-lb) beyond pinion preload. Torque bearing cap bolts to 85 Nm (63 ft-lb) and install lock tabs (13 Nm).",
+        torqueCallout: "Bearing Cap Bolts: 85 Nm (63 ft-lb)",
+        checkItem: "Bearing caps torqued and lock tabs secured"
+      },
+      {
+        stepNumber: 5,
+        title: "Inspect Gear Tooth Contact Pattern",
+        instruction: "Paint 4 ring gear teeth with Prussian blue marking paste. Rotate pinion flange through 3 full revolutions under drag load. Observe tooth contact footprint: Pattern must be centered between heel and toe, positioned slightly toward the toe on the drive face.",
+        checkItem: "Drive and coast contact patterns centered oval"
+      },
+      {
+        stepNumber: 6,
+        title: "Install Third Member into Axle Housing",
+        instruction: "Clean axle flange. Apply 3mm continuous bead of Toyota Ultra Grey RTV around stud perimeter. Slide third member onto studs and torque 10x 14mm flange nuts to 73 Nm (54 ft-lb) in criss-cross pattern.",
+        torqueCallout: "Housing Stud Nuts: 73 Nm (54 ft-lb)"
+      }
+    ]
+  },
+  {
+    id: "clutch-replacement",
+    title: "Clutch Disc, Pressure Plate & Pilot/Release Bearing Overhaul",
+    category: "Drivetrain",
+    difficulty: "Master Mechanic",
+    estimatedTime: "6 - 8 Hours",
+    requiredSSTs: [
+      { number: "09301-20020", name: "Clutch Disc Spline Alignment Tool", description: "Centers clutch friction disc to pilot bearing during pressure plate torquing" },
+      { number: "09303-35011", name: "Pilot Bearing Puller & Slide Hammer", description: "Extracts bronze/roller pilot bearing from crankshaft snout" },
+      { number: "Universal", name: "Transmission Transmission Floor Jack & Straps", description: "Safely supports and balances 80 kg R150F/W56 gearbox" }
+    ],
+    consumables: [
+      "Heavy-Duty 225mm / 236mm Clutch Disc (21 Spline)",
+      "Diaphragm Spring Clutch Pressure Plate",
+      "Koyo Release Throwout Bearing & Pilot Bearing",
+      "High-Temp Urea Release Fork Spline Grease (Toyota 08887-01206)",
+      "Set of 6x High-Tensile Flywheel Bolts (123 Nm)"
+    ],
+    overview: "Replacing the clutch on the 1991 4Runner requires safely dropping the heavy manual transmission and transfer case, inspecting flywheel friction face runout (<0.10mm), packing the release fork pivot with high-temp grease, and aligning the disc spline.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Disconnect Driveshafts, Starter & Slave Cylinder",
+        instruction: "Matchmark and remove front and rear propeller driveshafts. Unbolt clutch slave cylinder (2x 12mm bolts) from bellhousing and hang out of way. Unbolt starter motor (2x 14mm bolts) and disconnect wiring.",
+        checkItem: "Driveshafts matchmarked and starter removed"
+      },
+      {
+        stepNumber: 2,
+        title: "Remove Interior Shifters & Crossmember",
+        instruction: "Remove cabin center console. Unbolt transmission and 4WD transfer case shifter boots and extract levers. Support transmission with transmission jack. Unbolt transmission crossmember (8x 14mm bolts).",
+        checkItem: "Shifter levers removed and gearbox supported"
+      },
+      {
+        stepNumber: 3,
+        title: "Drop Transmission & Bellhousing",
+        instruction: "Remove 9x bellhousing-to-engine block bolts. Slide transmission rearward horizontally until the input shaft completely clears the clutch pressure plate. Lower jack slowly.",
+        warningAlert: "Never let transmission hang on the input shaft while splines are partially engaged, as this bends the clutch disc hub."
+      },
+      {
+        stepNumber: 4,
+        title: "Remove Pressure Plate, Disc & Flywheel",
+        instruction: "Loosen 6x 12mm pressure plate bolts evenly (1 turn each) in criss-cross order. Remove clutch disc. Lock flywheel ring gear and remove 6x 17mm flywheel center bolts. Resurface flywheel friction face (step height: 0.50 mm).",
+        torqueCallout: "Flywheel Center Bolts: 123 Nm (91 ft-lb)"
+      },
+      {
+        stepNumber: 5,
+        title: "Replace Pilot Bearing & Rear Main Crank Seal",
+        instruction: "Extract old pilot bearing using slide hammer. Drive new sealed pilot bearing into crank snout. Inspect rear main crankshaft oil seal for leakage; replace if wet with engine oil.",
+        sstNumber: "09303-35011",
+        checkItem: "New pilot bearing seated flush"
+      },
+      {
+        stepNumber: 6,
+        title: "Install Clutch Disc with SST Alignment Tool",
+        instruction: "Wipe flywheel clean with brake cleaner. Position new clutch disc with stamped 'FLYWHEEL SIDE' facing engine. Insert SST 09301-20020 through disc hub into pilot bearing. Install pressure plate over dowels.",
+        sstNumber: "09301-20020",
+        checkItem: "Disc perfectly centered on pilot bearing"
+      },
+      {
+        stepNumber: 7,
+        title: "Torque Pressure Plate Bolts in Criss-Cross Order",
+        instruction: "Tighten 6x pressure plate bolts progressively in star pattern to 19 Nm (14 ft-lb). Remove SST alignment tool. Verify disc does not shift.",
+        torqueCallout: "Pressure Plate Bolts: 19 Nm (14 ft-lb)",
+        checkItem: "All 6 bolts torqued to 19 Nm in criss-cross order"
+      },
+      {
+        stepNumber: 8,
+        title: "Service Release Bearing & Pivot Ball",
+        instruction: "Install new throwout bearing onto slide quill. Apply high-temp urea grease to release fork pivot ball, fork fingers, and input shaft spline teeth.",
+        checkItem: "Release bearing slides effortlessly on guide quill"
+      },
+      {
+        stepNumber: 9,
+        title: "Reinstall Transmission & Bleed Hydraulic Clutch",
+        instruction: "Raise gearbox, align input shaft splines, slide flush against block, and torque bellhousing bolts to 72 Nm. Reinstall slave cylinder, fill master cylinder with DOT 4 fluid, and bleed air.",
+        torqueCallout: "Bellhousing Bolts: 72 Nm (53 ft-lb)"
+      }
+    ]
+  },
+  {
+    id: "fan-clutch-rebuild",
+    title: "Viscous Fan Clutch Silicone Fluid Drain & 10,000 cSt Refill Service",
+    category: "Cooling",
+    difficulty: "Beginner",
+    estimatedTime: "1 Hour",
+    requiredSSTs: [
+      { number: "Universal", name: "Heat Gun & Digital Thermometer", description: "Verifies bimetallic coil spring unwinding between 65°C and 70°C" }
+    ],
+    consumables: [
+      "Toyota Genuine Silicone Fluid 10,000 cSt (Toyota 08816-03001 / 2x 18ml tubes)",
+      "High-Temperature Housing Perimeter O-Ring",
+      "Blue Medium-Strength Threadlocker (Loctite 242)"
+    ],
+    overview: "The Aisin viscous fan clutch on the 2L-T is the primary defense against head cracking. Over 10-15 years, the internal silicone fluid shears down or leaks out, causing the fan to slip and move only 30% of required CFM. This procedure restores 100% factory locking engagement.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Remove Fan Assembly from Water Pump",
+        instruction: "Unbolt 4x 10mm nuts securing fan clutch to water pump pulley studs. Unclip radiator fan shroud and lift fan clutch assembly out of engine bay.",
+        checkItem: "Fan blades inspected for cracks or chipping"
+      },
+      {
+        stepNumber: 2,
+        title: "Disassemble Housing Halves",
+        instruction: "Place clutch on bench. Remove 4x Phillips/hex screws securing front and rear aluminum housing halves. Carefully separate halves using a utility blade to break the perimeter seal.",
+        warningAlert: "Do not bend or pry violently on the aluminum mating flanges."
+      },
+      {
+        stepNumber: 3,
+        title: "Clean Out Old Degraded Silicone Fluid",
+        instruction: "Drain old discolored silicone fluid into catch pan. Clean internal fluid drive grooves and valve plate with brake cleaner and compressed air until clean and dry.",
+        checkItem: "Drive grooves cleaned of old scorched silicone fluid"
+      },
+      {
+        stepNumber: 4,
+        title: "Test Bimetallic Coil Spring Thermostatic Valve",
+        instruction: "Direct a heat gun onto the front bimetallic spiral spring while monitoring with thermometer. At 65°C – 70°C, the spring must rotate and open the internal fluid gate valve completely.",
+        checkItem: "Valve plate opens smoothly at 65°C–70°C"
+      },
+      {
+        stepNumber: 5,
+        title: "Inject Fresh 10,000 cSt Silicone Fluid",
+        instruction: "Dispense exactly 40 – 45 ml of Toyota 10,000 cSt silicone oil evenly into the rear reservoir chamber. For heavy towing / hot climates, 50 ml provides earlier lockup.",
+        checkItem: "40-45ml of 10,000 cSt fluid added"
+      },
+      {
+        stepNumber: 6,
+        title: "Install New O-Ring & Re-Torque Housing Screws",
+        instruction: "Fit new perimeter rubber O-ring. Mate housing halves, apply blue threadlocker to screws, and tighten evenly in criss-cross pattern to 6.5 Nm.",
+        torqueCallout: "Housing Screws: 6.5 Nm (58 in-lb)",
+        checkItem: "Housing sealed with zero fluid leaks around perimeter"
+      },
+      {
+        stepNumber: 7,
+        title: "Reinstall on Vehicle & Verify Hydraulic Drag",
+        instruction: "Re-bolt fan clutch to water pump studs (10 Nm). Spin fan by hand to verify smooth heavy hydraulic drag.",
+        torqueCallout: "Pulley Nuts: 10 Nm (89 in-lb)"
+      }
+    ]
+  },
+  {
+    id: "steering-gearbox-service",
+    title: "Steering Gearbox Backlash Preload Adjustment & Idler Arm Bushing Overhaul",
+    category: "Suspension & Brakes",
+    difficulty: "Intermediate",
+    estimatedTime: "2 Hours",
+    requiredSSTs: [
+      { number: "09610-20012", name: "Pitman Arm Puller", description: "Separates tapered pitman arm from steering box sector shaft" },
+      { number: "Universal", name: "Spring Scale & Dial Indicator", description: "Measures steering wheel center deadband and sector backlash" }
+    ],
+    consumables: [
+      "Heavy-Duty Bronze/Delrin Idler Arm Bushing Upgrade Kit",
+      "NLGI No. 2 Molybdenum Disulfide Chassis Grease",
+      "Locknut Sealing Washer"
+    ],
+    overview: "Eliminates dangerous 2-inch steering wheel deadband play and wandering on highway ruts by adjusting the sector shaft mesh preload on the recirculating-ball steering gearbox and upgrading worn plastic idler arm bushings.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Check Steering Center On-Center Play",
+        instruction: "With front wheels pointed straight ahead on flat ground, wiggle steering wheel lightly. Measure free play at wheel rim: Standard free play must be under 30 mm (1.18 in). If free play > 40 mm, perform gearbox and idler adjustment.",
+        checkItem: "Steering free play measured"
+      },
+      {
+        stepNumber: 2,
+        title: "Inspect & Re-Bush Passenger-Side Idler Arm",
+        instruction: "Have an assistant rock the steering wheel while inspecting the passenger-side idler arm frame bracket. If the idler shaft moves vertically, unbolt idler arm, press out worn soft factory plastic bushings, and install heavy-duty bronze/Delrin bushings packed with moly grease.",
+        torqueCallout: "Idler Frame Bolts: 142 Nm (105 ft-lb)",
+        checkItem: "Zero vertical deflection in idler arm pivot"
+      },
+      {
+        stepNumber: 3,
+        title: "Loosen Sector Shaft Adjuster Locknut",
+        instruction: "Locate the slotted sector shaft adjusting screw on top of the steering gearbox (driver side frame rail). Loosen the 17mm locknut while holding the center slotted screw steady with a flathead screwdriver.",
+        checkItem: "17mm locknut backed off 1 full turn"
+      },
+      {
+        stepNumber: 4,
+        title: "Adjust Sector Shaft Mesh Preload",
+        instruction: "Ensure front wheels are pointed DEAD STRAIGHT AHEAD (sector teeth have highest contact at center). Turn the slotted adjusting screw clockwise in 1/8-turn increments to reduce gear tooth clearance. Turn steering wheel lock-to-lock: Steering must feel smooth through center with zero binding or tight spots.",
+        warningAlert: "CRITICAL: Do NOT over-tighten! Excessive preload destroys the recirculating ball worm gear and prevents steering self-centering after turns."
+      },
+      {
+        stepNumber: 5,
+        title: "Torque Locknut & Road Test",
+        instruction: "Hold slotted screw firmly in adjusted position and torque 17mm locknut to 44 Nm (32 ft-lb). Grease all 4 steering tie-rod ball joints and center drag link zerks.",
+        torqueCallout: "Sector Adjuster Locknut: 44 Nm (32 ft-lb)",
+        checkItem: "Steering self-centers smoothly after 90° low-speed turn"
+      }
+    ]
+  },
+  {
+    id: "alternator-vacuum-pump-service",
+    title: "Alternator & Rear Vacuum Vane Pump Overhaul & Oil Banjo Cleaning",
+    category: "Electrical",
+    difficulty: "Advanced",
+    estimatedTime: "2.5 Hours",
+    requiredSSTs: [
+      { number: "Digital Multimeter & Vacuum Gauge", name: "Multimeter & 0-760 mmHg Vacuum Gauge", description: "Measures charging voltage and vacuum draw (500-600 mmHg)" }
+    ],
+    consumables: [
+      "Vacuum Pump Carbon Vanes (Set of 4x)",
+      "Rear Housing O-Ring & Shaft Lip Seal",
+      "Alternator Carbon Brushes (Toyota 27370-54050)",
+      "Copper Banjo Sealing Washers (4x 14mm)"
+    ],
+    overview: "Because diesel engines produce no manifold vacuum, the 2L-T utilizes an oil-lubricated rotary vane pump mounted to the back of the alternator. This procedure services vacuum vanes, cleans the oil feed banjo restrictor, and replaces alternator carbon brushes.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Remove Alternator / Vacuum Pump Assembly",
+        instruction: "Disconnect battery ground cable. Unbolt 14mm engine oil supply line and drain hose from the rear vacuum pump housing. Disconnect 3-pin electrical harness and B+ output cable. Loosen pivot and tensioner bolts; remove alternator from bracket.",
+        warningAlert: "Catch dripping oil with a rag and plug block oil ports immediately."
+      },
+      {
+        stepNumber: 2,
+        title: "Disassemble Rear Vacuum Pump Housing",
+        instruction: "Remove 3x 10mm bolts securing the rear cast iron vacuum pump cover. Pull housing off rotor shaft.",
+        checkItem: "Vacuum pump housing separated from alternator rear"
+      },
+      {
+        stepNumber: 3,
+        title: "Measure Carbon Vane Thickness & Housing Wear",
+        instruction: "Extract the 4 sliding carbon vanes from rotor slots. Measure vane thickness (Standard: 4.0 mm / Wear Limit: 3.5 mm). Inspect internal cylindrical housing bore for deep gouges or scoring.",
+        checkItem: "All 4 vanes > 3.5mm thick with clean sliding action"
+      },
+      {
+        stepNumber: 4,
+        title: "Clean Oil Supply Banjo Restrictor Hole",
+        instruction: "Inspect the 14mm oil supply banjo bolt. Clean the tiny 1.5mm internal oil restrictor jet with solvent and compressed air.",
+        warningAlert: "Blocked restrictor starves vacuum vanes of oil, causing catastrophic pump seizure that snaps the alternator drive belt."
+      },
+      {
+        stepNumber: 5,
+        title: "Inspect Alternator Carbon Brushes",
+        instruction: "Remove rear plastic brush holder cover. Measure exposed carbon brush length (Standard: 10.5 mm / Minimum Limit: 4.5 mm). Solder in new brushes if worn near limit line.",
+        checkItem: "Brush length > 4.5mm with smooth slip ring contact"
+      },
+      {
+        stepNumber: 6,
+        title: "Reassemble with New Seals & Test Vacuum",
+        instruction: "Install new shaft lip seal and perimeter O-ring. Torque pump housing bolts to 11 Nm. Reinstall on engine with new copper banjo washers (25 Nm). Start engine: Output must measure 13.8–14.6V and vacuum gauge must pull 500–600 mmHg at idle.",
+        torqueCallout: "Oil Banjo Bolts: 25 Nm | Pump Housing: 11 Nm",
+        checkItem: "Alternator charges >13.8V and vacuum reaches >500 mmHg"
+      }
+    ]
+  },
+  {
     id: "ve-pump-reseal",
     title: "Bosch VE Injection Pump Top Cover Re-Seal & LDA Diaphragm Service",
     category: "Fuel & Turbo",
