@@ -127,6 +127,236 @@ export const PROCEDURES_DATA: Procedure[] = [
     ]
   },
   {
+    id: "ct20-turbo-service",
+    title: "CT20 Turbocharger Inspection, Wastegate Bench Testing & Overhaul",
+    category: "Fuel & Turbo",
+    difficulty: "Advanced",
+    estimatedTime: "3 - 4 Hours",
+    requiredSSTs: [
+      { number: "09275-54011", name: "Dial Indicator & Stand", description: "Measures wastegate actuator stroke and turbine shaft radial/axial play" },
+      { number: "Universal", name: "Regulated Pressure Test Gun & Gauge", description: "Applies 0-1.5 bar air pressure to actuator canister" }
+    ],
+    consumables: [
+      "CT20 Multi-Layer Stainless Exhaust Gasket Kit",
+      "Viton Turbo Oil Drain Flange O-Ring",
+      "High-Temperature Copper Locknuts (M10x1.25)",
+      "4mm Reinforced Silicone Boost Hose"
+    ],
+    overview: "The water-cooled Toyota CT20 turbocharger requires precise wastegate actuator calibration to maintain 0.50–0.72 bar (7.1–10.2 psi) standard boost pressure without thermal over-boost.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Inspect Shaft End Play & Radial Clearances",
+        instruction: "Remove air inlet duct and exhaust downpipe. Mount dial indicator on compressor housing. Push turbine shaft back and forth to measure Axial Play (Standard: 0.040–0.080 mm / Limit: 0.11 mm). Measure Radial Play by wiggling shaft side-to-side (Standard: 0.080–0.180 mm / Limit: 0.22 mm).",
+        checkItem: "Axial play < 0.08mm and radial play < 0.18mm"
+      },
+      {
+        stepNumber: 2,
+        title: "Bench Test Wastegate Actuator Opening Pressure",
+        instruction: "Connect regulated air supply and pressure gauge to actuator nipple. Mount dial indicator on the actuator pushrod tip. Gradually apply pressure: The pushrod must begin moving at 0.78–0.84 bar (11.3–12.2 psi) for 0.38 mm stroke.",
+        warningAlert: "If actuator diaphragm leaks air or fails to move smoothly, replace actuator assembly."
+      },
+      {
+        stepNumber: 3,
+        title: "Clean Oil Supply Tube Restrictor Orifice",
+        instruction: "Remove the steel turbo oil feed line. Inspect the banjo bolt internal restrictor hole for baked carbon sludge. Clean in ultrasonic bath or brake cleaner.",
+        warningAlert: "CRITICAL: Carbon blockage in oil feed line causes instantaneous turbo bearing seizure within 30 seconds of starting."
+      },
+      {
+        stepNumber: 4,
+        title: "Pre-Lube Turbo Bearings Before First Start",
+        instruction: "Before connecting oil feed line, pour 20ml of fresh clean engine oil directly into the top oil feed port of the turbo. Spin compressor wheel by hand to coat floating journal bearings.",
+        checkItem: "Turbo CHRA bearing cavity primed with clean oil"
+      },
+      {
+        stepNumber: 5,
+        title: "Re-Torque Turbo Flanges & Heat Shield",
+        instruction: "Install new stainless gasket. Torque turbo-to-manifold flange nuts to 52 Nm (38 ft-lb) using copper locknuts. Torque downpipe nuts to 44 Nm.",
+        torqueCallout: "Manifold Flange: 52 Nm (38 ft-lb) | Downpipe: 44 Nm"
+      }
+    ]
+  },
+  {
+    id: "ve-pump-reseal",
+    title: "Bosch VE Injection Pump Top Cover Re-Seal & LDA Diaphragm Service",
+    category: "Fuel & Turbo",
+    difficulty: "Advanced",
+    estimatedTime: "2 - 3 Hours",
+    requiredSSTs: [
+      { number: "Universal", name: "Scribe & Depth Micrometer", description: "Indexes LDA fuel enrichment cone and maximum fuel smoke screw" }
+    ],
+    consumables: [
+      "Bosch VE Top Cover Rubber Perimeter Gasket",
+      "Throttle Shaft O-Ring & Brass Bushing Kit",
+      "LDA Boost Compensator Rubber Diaphragm",
+      "Brake Cleaner & Lint-Free Wipes"
+    ],
+    overview: "Fuel leaks around the throttle lever or oil leaks from the boost compensator on the Bosch VE pump are easily serviced on-engine without removing the pump.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Scribe Throttle Lever Alignment Mark",
+        instruction: "Use a sharp metal scribe to mark the exact position of the serrated throttle arm relative to the throttle shaft center. Remove 10mm locknut and return spring.",
+        warningAlert: "CRITICAL: If throttle lever is reinstalled even 1 tooth off spline, engine may fail to idle or suffer uncontrolled high-RPM run-away."
+      },
+      {
+        stepNumber: 2,
+        title: "Remove Top Cover Screws",
+        instruction: "Clean top of pump thoroughly. Loosen 4x slotted screws securing aluminum top cover. Lift cover carefully while holding down the internal governor shaft with a small punch.",
+        checkItem: "Top cover lifted without disturbing internal governor spring"
+      },
+      {
+        stepNumber: 3,
+        title: "Replace Throttle Shaft O-Ring & Seal",
+        instruction: "Slide throttle shaft out of top cover. Extract old hardened rubber O-ring. Lubricate new Viton O-ring with clean diesel and slide into groove. Inspect brass bushing for oval wear.",
+        checkItem: "New O-ring seated smoothly in groove"
+      },
+      {
+        stepNumber: 4,
+        title: "Inspect & Re-Index LDA Boost Cone Diaphragm",
+        instruction: "Remove 4x top screws on boost compensator capsule. Scribe alignment line on rubber diaphragm. Pull eccentric cone assembly straight up. Clean guide pin bore. Install new diaphragm matching original rotation index mark.",
+        checkItem: "Eccentric cone eccentric ramp oriented correctly toward fuel pin"
+      },
+      {
+        stepNumber: 5,
+        title: "Reinstall Cover & Prime Fuel System",
+        instruction: "Install new perimeter gasket. Lower top cover, engage governor spring in lever hole, and tighten 4x screws to 8 Nm. Reinstall throttle arm matching scribe mark. Pump fuel primer until firm.",
+        torqueCallout: "Top Cover Screws: 8 Nm (71 in-lb)"
+      }
+    ]
+  },
+  {
+    id: "add-vsv-service",
+    title: "4WD ADD Vacuum Switching Valves (VSVs) & Actuator Overhaul",
+    category: "Drivetrain",
+    difficulty: "Intermediate",
+    estimatedTime: "1.5 Hours",
+    requiredSSTs: [
+      { number: "Digital Multimeter", name: "Ohmmeter & Hand Vacuum Pump / Gauge", description: "Measures solenoid resistance and actuator diaphragm vacuum hold" }
+    ],
+    consumables: [
+      "Toyota OEM Blue 4WD VSV (85420-24010)",
+      "3.5mm High-Temp Silicone Vacuum Hose (2 Meters)",
+      "Dielectric Grease"
+    ],
+    overview: "Diagnoses and restores the Automatic Disconnecting Differential (ADD) system on IFS 4Runners to eliminate flashing 4WD dash lights and failure to engage front axle drive.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Test VSV Solenoid Coil Resistances",
+        instruction: "Unplug 2-pin electrical connectors on Blue (4WD engage) and Brown (2WD disengage) VSVs on inner fender. Measure resistance across the 2 male pins on each valve. Specification: 38 – 45 Ω at 20°C.",
+        checkItem: "Both VSV coils read 38 – 45 Ω (Infinite = burned coil)"
+      },
+      {
+        stepNumber: 2,
+        title: "Test VSV Airflow Switching with 12V",
+        instruction: "Connect hand vacuum pump to VSV inlet port. Without power, air should bleed to atmospheric filter. Apply 12V battery power across pins: Solenoid should click and route vacuum straight through to front diff port.",
+        checkItem: "VSVs switch vacuum cleanly when energized"
+      },
+      {
+        stepNumber: 3,
+        title: "Vacuum Leakdown Test on Front Differential Actuator",
+        instruction: "Raise vehicle on jackstands. Connect hand vacuum pump to front axle actuator left port. Apply 500 mmHg vacuum. The actuator must hold vacuum for 60 seconds without dropping more than 20 mmHg while spinning the left front wheel to lock.",
+        timerDurationSeconds: 60,
+        timerLabel: "Actuator Vacuum Hold Test (60 sec)",
+        checkItem: "Actuator diaphragm holds vacuum and locks axle shaft"
+      },
+      {
+        stepNumber: 4,
+        title: "Replace Split Rubber Vacuum Lines",
+        instruction: "Replace old cracked rubber hoses from engine vacuum storage tank down to front axle with new 3.5mm silicone vacuum hose. Secure with spring wire clamps.",
+        checkItem: "All vacuum lines securely routed away from exhaust downpipe"
+      }
+    ]
+  },
+  {
+    id: "lspv-brake-service",
+    title: "Load Sensing Proportioning Valve (LSPV) Height Calibration & 5-Point Bleed",
+    category: "Suspension & Brakes",
+    difficulty: "Intermediate",
+    estimatedTime: "1.5 Hours",
+    requiredSSTs: [
+      { number: "09709-29018", name: "Dual Hydraulic Pressure Gauges", description: "Measures front caliper vs rear wheel cylinder hydraulic pressure" }
+    ],
+    consumables: [
+      "DOT 4 High Boiling Point Brake Fluid (1.5 Liters)",
+      "Clear Bleeder Hose & Catch Bottle",
+      "Penetrating Oil for Bleeder Screws"
+    ],
+    overview: "Critical for lifted 4Runners to prevent dangerous rear-wheel lockup under emergency braking. Re-calibrates the sensing shackle rod and bleeds the hidden 5th bleeder on the LSPV body.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Inspect Shackle Spring Length at Curb Weight",
+        instruction: "Place vehicle on flat level ground with unladen curb weight (full tank of fuel, empty cargo area). Measure distance 'L' of the LSPV shackle sensing spring from axle bracket to valve body arm (Standard: 125 ± 2 mm).",
+        checkItem: "Spring length recorded at curb weight"
+      },
+      {
+        stepNumber: 2,
+        title: "Adjust Shackle Bracket for Lift Kits",
+        instruction: "If rear suspension is lifted 2 inches (50mm), the axle bracket must be extended downward by exactly 50mm using an LSPV drop bracket, or adjust the threaded shackle bolt so the valve arm rests in neutral horizontal position.",
+        warningAlert: "Never leave LSPV unadjusted after a suspension lift! It causes severe rear wheel lockup and vehicle spin-out on wet roads."
+      },
+      {
+        stepNumber: 3,
+        title: "Execute Toyota 5-Point Brake Bleeding Sequence",
+        instruction: "Bleed in exact factory order: 1) LSPV Body Bleeder Valve (near rear axle) &rarr; 2) Rear Left Drum &rarr; 3) Rear Right Drum &rarr; 4) Front Left Caliper &rarr; 5) Front Right Caliper. Keep master cylinder reservoir full of DOT 4 fluid.",
+        torqueCallout: "Bleeder Screws: 8.5 Nm (75 in-lb)",
+        checkItem: "All 5 bleeder points purged of micro-bubbles"
+      }
+    ]
+  },
+  {
+    id: "injector-nozzle-service",
+    title: "Fuel Injector Nozzle Pop-Testing, Spray Pattern & Shimming",
+    category: "Fuel & Turbo",
+    difficulty: "Advanced",
+    estimatedTime: "2.5 Hours",
+    requiredSSTs: [
+      { number: "09260-54012", name: "Diesel Injector Pop Tester Stand", description: "Manual hydraulic tester with 0-300 bar pressure gauge" },
+      { number: "09268-54011", name: "Nozzle Holder Socket (21mm/27mm)", description: "Deep hex socket for 2L-T two-piece injector holders" }
+    ],
+    consumables: [
+      "Nippondenso DN4PD57 / DN0PDN112 Throttle Nozzle Tips (4x)",
+      "Internal Pressure Adjusting Shims (0.90mm - 1.95mm)",
+      "Combustion Chamber Copper Heat Shield Washers (4x)",
+      "Aluminum Leak-Off Return Rail Crush Washers (8x)"
+    ],
+    overview: "Worn injector nozzles cause black smoke, diesel knocking, and excessive fuel consumption. This procedure pop-tests opening pressure and verifies chattering spray atomization.",
+    steps: [
+      {
+        stepNumber: 1,
+        title: "Remove Injector Holders from Cylinder Head",
+        instruction: "Disconnect leak-off fuel return rail and high pressure steel lines. Using 27mm deep socket, unscrew all 4 injector holders from pre-chambers. Extract old copper seat washers with brass hook.",
+        torqueCallout: "Nozzle Holder to Head: 64 Nm (47 ft-lb)"
+      },
+      {
+        stepNumber: 2,
+        title: "Disassemble & Ultrasonic Clean Nozzle Bodies",
+        instruction: "Clamp holder in vise. Loosen 21mm retaining nut. Remove nozzle tip, distance piece, pressure spring, and adjusting shim. Clean carbon in ultrasonic cleaner with diesel solvent.",
+        warningAlert: "Do not touch nozzle needle mating surfaces with bare steel wire."
+      },
+      {
+        stepNumber: 3,
+        title: "Pop-Test Opening Pressure & Atomization",
+        instruction: "Mount assembled injector on pop-tester. Pump lever slowly: 1) Initial Opening Pressure: Standard 145–155 kg/cm² (2,062–2,204 psi). 2) Leakage Test: Hold pressure at 130 kg/cm² for 10 sec; zero dripping from nozzle tip allowed. 3) Chattering: Rapid pumps should produce a crisp whistling buzz with cone mist.",
+        checkItem: "Opening pressure 145-155 kg/cm² and zero droplet leakage"
+      },
+      {
+        stepNumber: 4,
+        title: "Adjust Pressure with Shims",
+        instruction: "If opening pressure is too low, install a thicker adjusting shim inside the holder. A 0.04 mm shim thickness change alters opening pressure by approximately 5.0 kg/cm² (71 psi).",
+        checkItem: "All 4 injectors matched within 3 kg/cm² of each other"
+      },
+      {
+        stepNumber: 5,
+        title: "Reinstall with New Copper Combustion Washers",
+        instruction: "Drop brand new copper washer (flanged side facing UP) into head pre-chamber. Install new corrugated heat shield washer. Torque injector holders to 64 Nm and leak-off rail banjo nuts to 29 Nm.",
+        torqueCallout: "Holder: 64 Nm (47 ft-lb) | Return Rail: 29 Nm (21 ft-lb)"
+      }
+    ]
+  },
+  {
     id: "timing-belt-service",
     title: "Timing Belt & Tensioner Replacement (Alignment & Tensioning)",
     category: "Engine",

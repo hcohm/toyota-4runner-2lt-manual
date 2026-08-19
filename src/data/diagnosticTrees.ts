@@ -1,47 +1,51 @@
+export interface DiagnosticConclusion {
+  title: string;
+  severity: "critical" | "warning" | "info";
+  cause: string;
+  fix: string;
+  procedureRef?: string;
+}
+
 export interface DiagnosticNode {
   id: string;
-  question: string;
   category: string;
+  question: string;
   testAction?: string;
   expectedSpec?: string;
   options: {
     label: string;
     nextNodeId?: string;
-    conclusion?: {
-      title: string;
-      severity: "critical" | "warning" | "info";
-      cause: string;
-      fix: string;
-      procedureRef?: string;
-    };
+    conclusion?: DiagnosticConclusion;
   }[];
 }
 
 export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
-  // Tree 1: Engine Cranks But Will Not Start
+  // ==========================================
+  // TREE 1: STARTING SYSTEM & NO-START
+  // ==========================================
   "start-node-no-start": {
     id: "start-node-no-start",
     category: "Starting System",
-    question: "Does the symptom occur only on a COLD engine, or even when the engine is warm?",
+    question: "Does the no-start / hard-start symptom occur only on a COLD engine, or even when the engine is warm?",
     options: [
-      { label: "Only on Cold Start (Colder than 20°C / 68°F)", nextNodeId: "no-start-cold-glow" },
-      { label: "Both Cold and Warm / Sudden Shutdown", nextNodeId: "no-start-fuel-solenoid" }
+      { label: "Only on Cold Start (Engine cold / ambient < 20°C)", nextNodeId: "no-start-cold-glow" },
+      { label: "Both Cold and Warm / Sudden Engine Shutdown", nextNodeId: "no-start-fuel-solenoid" }
     ]
   },
   "no-start-cold-glow": {
     id: "no-start-cold-glow",
     category: "Starting System",
-    question: "When you turn the ignition key to ON, does the glow plug indicator light illuminate and can you hear the heavy 'thunk' click of Glow Relay No. 1 within 2-6 seconds?",
-    testAction: "Turn key to ON with driver door open. Listen under hood near driver side fender for relay click.",
+    question: "When turning ignition key to ON, does the amber GLOW light illuminate and can you hear the heavy 'thunk' of Glow Relay No. 1 within 2-6 seconds?",
+    testAction: "Turn key to ON with driver door open. Listen near driver-side inner fender for relay click.",
     options: [
-      { label: "Yes, relay clicks and glow light turns on for ~4 seconds", nextNodeId: "no-start-cold-plugs-test" },
+      { label: "Yes, relay clicks and glow light illuminates for ~4 seconds", nextNodeId: "no-start-cold-plugs-test" },
       {
-        label: "No relay click or glow light flashes rapidly / stays off",
+        label: "No relay click or glow light flashes rapidly / stays completely dark",
         conclusion: {
           title: "Super Glow Pre-Heating Circuit Failure",
           severity: "warning",
-          cause: "Blown GLOW fusible link (80A) in engine bay fuse box, failed Glow Plug Timer ECU behind driver kick panel, or dead Glow Relay No. 1.",
-          fix: "Check 80A GLOW fusible link with multimeter. Verify 12V trigger on small terminals of Glow Relay No. 1 with key in ON position. Replace relay or timer module.",
+          cause: "Blown 80A GLOW fusible link in engine bay fuse box, failed Glow Plug Timer ECU (driver kick panel), or open circuit in Glow Relay No. 1 coil.",
+          fix: "Test 80A GLOW fusible link with multimeter. Verify 12V trigger on small terminals of Glow Relay No. 1 with key ON. Replace relay or timer module.",
           procedureRef: "super-glow-diagnosis"
         }
       }
@@ -50,16 +54,16 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
   "no-start-cold-plugs-test": {
     id: "no-start-cold-plugs-test",
     category: "Starting System",
-    question: "Disconnect the glow plug bus bar. Test resistance of each of the 4 glow plugs with a multimeter from terminal to ground. What are your readings?",
-    expectedSpec: "0.65 – 0.85 Ω per plug at 20°C",
+    question: "Disconnect the metal glow plug bus bar. Test resistance of each of the 4 glow plugs with a multimeter from terminal post to cylinder head ground. What are the readings?",
+    expectedSpec: "0.65 – 0.85 Ω per plug @ 20°C",
     options: [
       {
-        label: "One or more plugs show Infinite (OL) / high resistance (>2.0 Ω)",
+        label: "One or more glow plugs show Infinite (OL) / high resistance (>2.0 Ω)",
         conclusion: {
           title: "Burned Out Glow Plugs",
           severity: "warning",
-          cause: "One or more ceramic/metallic glow plugs have burned open, preventing pre-chamber temperature from reaching diesel auto-ignition threshold.",
-          fix: "Replace all 4 glow plugs with OEM spec 6V plugs (Toyota 19850-54090). Torque to 13 Nm. Do not overtighten.",
+          cause: "One or more ceramic/metallic glow plugs have burned open, preventing pre-combustion chamber temperature from reaching diesel auto-ignition threshold.",
+          fix: "Replace all 4 glow plugs with OEM spec 6V fast-heating plugs (Toyota 19850-54090). Torque to 13 Nm. Do not overtighten.",
           procedureRef: "super-glow-diagnosis"
         }
       },
@@ -79,7 +83,8 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
           title: "Fuel Cut Solenoid Dead / Ignition Feed Open",
           severity: "critical",
           cause: "The Bosch VE fuel cut solenoid is closed, completely blocking diesel supply into the high-pressure distributor head.",
-          fix: "Check IGN 15A fuse and ignition switch harness. If 12V is present at the wire but the solenoid does not click, unscrew the 24mm solenoid from pump, replace internal O-ring and plunger assembly, or replace solenoid unit."
+          fix: "Check IGN 15A fuse and ignition switch harness. If 12V is present at the wire but the solenoid does not click, unscrew the 24mm solenoid from pump, replace internal O-ring and plunger assembly, or replace solenoid unit.",
+          procedureRef: "procedures"
         }
       }
     ]
@@ -100,12 +105,13 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
         }
       },
       {
-        label: "Button gets rock hard quickly, but cracked injector flare nuts show no fuel squirt while cranking",
+        label: "Button gets rock hard quickly, but loosened injector flare nuts show no fuel squirt while cranking",
         conclusion: {
-          title: "VE Injection Pump Internal Screen Clogged or Shear Pin Failure",
+          title: "VE Injection Pump Internal Micro-Screen Clogged",
           severity: "critical",
           cause: "The micro-mesh banjo filter screen located under the pump fuel inlet union bolt is choked with algae/debris, or the pump drive gear woodruff key has sheared.",
-          fix: "Remove fuel inlet union banjo bolt on the VE pump. Use a pick to extract the internal 10mm micro-filter screen and clean with carb cleaner. Check pump drive shaft rotation."
+          fix: "Remove fuel inlet union banjo bolt on the VE pump. Use a pick to extract the internal 10mm micro-filter screen and clean with carb cleaner. Check pump drive shaft rotation.",
+          procedureRef: "procedures"
         }
       },
       {
@@ -143,7 +149,9 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
     ]
   },
 
-  // Tree 2: Engine Overheating Under Load
+  // ==========================================
+  // TREE 2: COOLING & OVERHEATING
+  // ==========================================
   "start-node-overheating": {
     id: "start-node-overheating",
     category: "Cooling System",
@@ -233,7 +241,9 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
     ]
   },
 
-  // Tree 3: Smoke Diagnostics
+  // ==========================================
+  // TREE 3: SMOKE & EMISSIONS
+  // ==========================================
   "start-node-smoke": {
     id: "start-node-smoke",
     category: "Exhaust Emissions",
@@ -291,7 +301,8 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
           title: "Turbo Boost Leak or Wastegate Actuator Stuck Open",
           severity: "warning",
           cause: "The Bosch VE boost compensator is injecting full fueling based on throttle, but actual boost pressure is lost through a split silicone crossover coupler or stuck wastegate flapper.",
-          fix: "Inspect all 3 turbo intercooler/crossover hoses for splits. Pressure test wastegate actuator (should begin moving at 0.78 bar)."
+          fix: "Inspect all 3 turbo intercooler/crossover hoses for splits. Pressure test wastegate actuator (should begin moving at 0.78 bar).",
+          procedureRef: "ct20-turbo-service"
         }
       },
       {
@@ -300,7 +311,8 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
           title: "Dripping Injection Nozzles (Low Pop Pressure) or Over-Adjusted VE Max Fuel Screw",
           severity: "warning",
           cause: "Injection nozzles have worn needles that drip large droplets rather than atomizing. Alternatively, previous owner has over-tightened the VE pump smoke screw.",
-          fix: "Re-shim injection nozzles to 145-155 kg/cm² opening pressure. Back off VE pump max fuel screw 1/4 turn counter-clockwise."
+          fix: "Pop-test injection nozzles to 145-155 kg/cm² opening pressure. Back off VE pump max fuel screw 1/4 turn counter-clockwise.",
+          procedureRef: "injector-nozzle-service"
         }
       }
     ]
@@ -316,7 +328,8 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
           title: "CT20 Turbocharger Journal Bearing / Dynamic Oil Seal Failure",
           severity: "warning",
           cause: "Exhaust side turbine or intake compressor dynamic piston ring seals worn from high mileage or restricted oil drain tube.",
-          fix: "Check turbo shaft radial play (limit: 0.18mm) and axial play (limit: 0.08mm). Rebuild CT20 turbo with 360° thrust bearing kit or replace cartridge (CHRA)."
+          fix: "Check turbo shaft radial play (limit: 0.18mm) and axial play (limit: 0.08mm). Rebuild CT20 turbo with 360° thrust bearing kit or replace cartridge (CHRA).",
+          procedureRef: "ct20-turbo-service"
         }
       },
       {
@@ -326,6 +339,387 @@ export const DIAGNOSTIC_TREES: Record<string, DiagnosticNode> = {
           severity: "warning",
           cause: "High mileage 2L-T valve stem Viton seals have hardened, allowing oil from the valvetrain to seep down valve guides into intake ports.",
           fix: "Replace valve stem seals using on-engine air pressure adapter or during cylinder head refresh."
+        }
+      }
+    ]
+  },
+
+  // ==========================================
+  // TREE 4: TURBO BOOST & POWER LOSS
+  // ==========================================
+  "start-node-power-loss": {
+    id: "start-node-power-loss",
+    category: "Turbo & Power",
+    question: "How does the engine behave when you step on the accelerator pedal?",
+    options: [
+      { label: "Engine feels completely flat like a non-turbo 2L, zero boost response", nextNodeId: "power-loss-boost-check" },
+      { label: "Engine accelerates fine initially but stutters / starves at > 2,800 RPM", nextNodeId: "power-loss-high-rpm-starve" },
+      { label: "Engine boosts normally but has severe lag and black smoke off idle", nextNodeId: "power-loss-low-end-lag" }
+    ]
+  },
+  "power-loss-boost-check": {
+    id: "power-loss-boost-check",
+    category: "Turbo & Power",
+    question: "Check the boost pressure line running from the aluminum crossover pipe to the top of the Bosch VE injection pump (LDA boost compensator). Is the hose intact and is the wastegate flapper arm connected?",
+    testAction: "Wiggle the wastegate actuator pushrod. Ensure circlip is intact and rod has strong spring tension.",
+    options: [
+      {
+        label: "Boost reference hose is split / disconnected, or wastegate arm is disconnected and flapper swings loose",
+        conclusion: {
+          title: "Disconnected Boost Reference or Stuck-Open Wastegate",
+          severity: "warning",
+          cause: "Without boost pressure reaching the VE pump top diaphragm, the fuel metering rod stays in zero-boost position. If wastegate flapper is loose, exhaust bypasses the turbine completely.",
+          fix: "Re-attach 4mm silicone boost hose with spring clamp. Reconnect wastegate actuator arm and install new stainless E-clip.",
+          procedureRef: "ct20-turbo-service"
+        }
+      },
+      {
+        label: "Hose and linkage are intact; pressure test shows wastegate diaphragm leaks air",
+        conclusion: {
+          title: "Ruptured Boost Compensator Diaphragm or Actuator Leak",
+          severity: "warning",
+          cause: "The rubber aneroid diaphragm inside the VE pump top capsule has torn from heat and age.",
+          fix: "Unscrew 4x top screws on VE pump boost compensator cap. Inspect rubber diaphragm for tears. Replace diaphragm and re-index eccentric fuel cone.",
+          procedureRef: "ve-pump-reseal"
+        }
+      },
+      { label: "Hose, linkage and diaphragm are good; boost gauge reads 0 psi", nextNodeId: "power-loss-turbine-seized" }
+    ]
+  },
+  "power-loss-turbine-seized": {
+    id: "power-loss-turbine-seized",
+    category: "Turbo & Power",
+    question: "Remove intake rubber hose from turbo compressor inlet. Try to spin the compressor wheel with your fingers. Does it spin smoothly?",
+    options: [
+      {
+        label: "Wheel is stiff / completely seized or scrapes against aluminum housing",
+        conclusion: {
+          title: "Seized CT20 Turbocharger Bearings",
+          severity: "critical",
+          cause: "Oil starvation or severe carbon coking in the turbo oil feed banjo line has destroyed the floating brass journal bearings.",
+          fix: "Replace CT20 turbocharger CHRA cartridge. Clean and blow out the steel turbo oil feed tube. Always use high-detergent CI-4 diesel oil.",
+          procedureRef: "ct20-turbo-service"
+        }
+      },
+      {
+        label: "Wheel spins freely with zero binding",
+        conclusion: {
+          title: "Exhaust System Restriction / Crushed Downpipe",
+          severity: "warning",
+          cause: "Crushed exhaust pipe or collapsed internal muffler baffle causing excessive backpressure.",
+          fix: "Inspect exhaust system from downpipe to tailpipe. Upgrade to 2.5\" free-flowing mandrel system."
+        }
+      }
+    ]
+  },
+  "power-loss-high-rpm-starve": {
+    id: "power-loss-high-rpm-starve",
+    category: "Fuel System",
+    question: "When the engine starves at high RPM, does pumping the manual fuel primer button on the filter temporarily restore power?",
+    options: [
+      {
+        label: "Yes, pumping the filter restores power for a few seconds",
+        conclusion: {
+          title: "Clogged Fuel Filter or Tank Pickup Strainer",
+          severity: "warning",
+          cause: "High fuel flow demand creates high vacuum in the suction line, collapsing fuel delivery due to dirt or diesel wax crystals in the filter media.",
+          fix: "Replace fuel filter cartridge (Toyota 23303-64010). If problem recurs, drop fuel tank and clean the brass sock strainer on the pickup sender tube."
+        }
+      },
+      {
+        label: "No, fuel filter is brand new; problem happens regardless",
+        conclusion: {
+          title: "VE Pump Internal Vane Transfer Pump Pressure Low",
+          severity: "warning",
+          cause: "Internal housing transfer pressure regulating valve is loose or stuck open, failing to advance injection timing dynamically at high RPM.",
+          fix: "Inspect the 10mm hex regulating valve on the side of the VE pump. Tap regulating pin lightly to restore 6–8 bar internal pressure or service pump.",
+          procedureRef: "ve-pump-reseal"
+        }
+      }
+    ]
+  },
+  "power-loss-low-end-lag": {
+    id: "power-loss-low-end-lag",
+    category: "Turbo & Power",
+    question: "Is the EGR (Exhaust Gas Recirculation) valve stuck open or leaking exhaust into the intake plenum off idle?",
+    options: [
+      {
+        label: "EGR pipe is scorching hot at idle / soot leaking around EGR valve shaft",
+        conclusion: {
+          title: "EGR Valve Stuck Open / Soot Contamination",
+          severity: "warning",
+          cause: "Carbon buildup is holding the EGR poppet valve open, contaminating fresh intake air with hot exhaust gas and destroying low-RPM spool.",
+          fix: "Remove EGR valve and clean with carb solvent, or install a 4mm stainless blanking plate on the exhaust manifold port."
+        }
+      }
+    ]
+  },
+
+  // ==========================================
+  // TREE 5: 4WD & DRIVELINE FAULTS
+  // ==========================================
+  "start-node-4wd": {
+    id: "start-node-4wd",
+    category: "4WD & Drivetrain",
+    question: "What is the exact 4WD malfunction on your LN130 4Runner?",
+    options: [
+      { label: "Shifted into 4H/4L, but green 4WD dash light flashes and front wheels have NO pull", nextNodeId: "4wd-flashing-light" },
+      { label: "Severe clunking / binding noise when turning tightly in 4WD on pavement", nextNodeId: "4wd-binding-turn" },
+      { label: "Front manual Aisin hub dial is extremely stiff / seized and will not turn to LOCK", nextNodeId: "4wd-hub-stiff" }
+    ]
+  },
+  "4wd-flashing-light": {
+    id: "4wd-flashing-light",
+    category: "4WD & Drivetrain",
+    question: "Look under the right front inner fender near the battery. Are the Blue (4WD) and Brown (2WD) vacuum switching valves (VSVs) receiving vacuum and 12V when transfer lever is moved?",
+    testAction: "Use a vacuum gauge on the blue VSV hose. Probe 2-pin connector with 12V test light with 4WD lever engaged.",
+    options: [
+      {
+        label: "Vacuum hose is split / cracked near front axle differential actuator",
+        conclusion: {
+          title: "ADD Differential Actuator Vacuum Leak",
+          severity: "warning",
+          cause: "The front axle Automatic Disconnecting Differential (ADD) relies on 500 mmHg vacuum to slide the clutch collar. Split vacuum hoses prevent mechanical lockup.",
+          fix: "Replace the 3.5mm rubber vacuum lines running down to the front differential actuator. Test diaphragm with hand vacuum pump.",
+          procedureRef: "add-vsv-service"
+        }
+      },
+      {
+        label: "VSV has vacuum but does NOT click or pass vacuum when 12V applied",
+        conclusion: {
+          title: "Dead ADD Vacuum Switching Valve (VSV)",
+          severity: "warning",
+          cause: "Electromagnetic coil inside the Blue 4WD engagement VSV has burned open (infinite resistance).",
+          fix: "Replace Blue VSV (Toyota 85420-24010). Normal coil resistance is 38–45 Ω.",
+          procedureRef: "add-vsv-service"
+        }
+      },
+      {
+        label: "Vacuum and VSVs work; front driveshaft spins, but indicator switch does not close",
+        conclusion: {
+          title: "Front Differential ADD Indicator Switch Open",
+          severity: "info",
+          cause: "The brass ball plunger indicator switch threaded into the front diff housing has dirty contacts.",
+          fix: "Unscrew 22mm switch on front axle tube, clean with contact spray, and verify continuity when ball is depressed."
+        }
+      }
+    ]
+  },
+  "4wd-binding-turn": {
+    id: "4wd-binding-turn",
+    category: "4WD & Drivetrain",
+    question: "Are you driving in 4WD mode on dry, high-traction asphalt or concrete pavement?",
+    options: [
+      {
+        label: "Yes, driving on dry pavement",
+        conclusion: {
+          title: "Normal Part-Time 4WD Driveline Wind-Up (Operator Warning)",
+          severity: "warning",
+          cause: "The 1991 4Runner LN130 has a Part-Time 4WD transfer case without a center differential. When turning, front and rear axles rotate at different speeds. On dry pavement, this creates extreme torque wind-up in the transfer case and axles.",
+          fix: "CRITICAL: Never engage 4WD on dry pavement! Only use 4H/4L on loose dirt, gravel, mud, snow, or sand."
+        }
+      },
+      {
+        label: "No, occurs off-road on dirt / clicking sound increases with wheel speed",
+        conclusion: {
+          title: "Worn Front CV Half-Shaft Outer Birfield Joint",
+          severity: "warning",
+          cause: "Torn rubber CV boot has allowed grease to wash out and dirt to enter the outer constant velocity joint balls.",
+          fix: "Replace the front CV half-shaft assembly or rebuild outer joint with new molybdenum grease and heavy-duty silicone boot."
+        }
+      }
+    ]
+  },
+  "4wd-hub-stiff": {
+    id: "4wd-hub-stiff",
+    category: "4WD & Drivetrain",
+    question: "Have the Aisin manual locking hubs been packed full of heavy wheel bearing grease recently?",
+    options: [
+      {
+        label: "Yes, packed full of thick chassis grease",
+        conclusion: {
+          title: "Over-Greased Aisin Manual Hub Clutch Binding",
+          severity: "warning",
+          cause: "Heavy wheel bearing grease creates hydraulic suction that prevents the sliding splined clutch ring and detent pawl from moving freely.",
+          fix: "Disassemble hub cover, wash out all heavy grease in solvent, and apply only a very light wipe of NLGI 2 grease or light oil.",
+          procedureRef: "aisin-manual-hub-rebuild"
+        }
+      }
+    ]
+  },
+
+  // ==========================================
+  // TREE 6: ENGINE NOISE & ROUGH IDLE
+  // ==========================================
+  "start-node-noise": {
+    id: "start-node-noise",
+    category: "Engine Noise",
+    question: "What type of abnormal sound or idle behavior is the 2L-T experiencing?",
+    options: [
+      { label: "Loud sharp metallic 'nailing' / hammer knocking that changes with RPM", nextNodeId: "noise-diesel-knock" },
+      { label: "Engine idle speed 'hunts' up and down rhythmically (600 - 900 RPM)", nextNodeId: "noise-hunting-idle" },
+      { label: "High-pitched rhythmic valvetrain ticking from top of valve cover", nextNodeId: "noise-valve-tick" },
+      { label: "Deep heavy thumping knock from bottom of oil pan under load", nextNodeId: "noise-bottom-end-knock" }
+    ]
+  },
+  "noise-diesel-knock": {
+    id: "noise-diesel-knock",
+    category: "Engine Noise",
+    question: "Crack open the 17mm fuel injection line flare nuts one by one with the engine running. Does the knock disappear when a specific cylinder is cut?",
+    testAction: "Use 17mm wrench with thick gloves; loosen line 1/2 turn to depressurize cylinder.",
+    options: [
+      {
+        label: "Yes, knock disappears completely when one specific injector is cracked open",
+        conclusion: {
+          title: "Dripping / Seized Fuel Injection Nozzle (Hydraulic Diesel Knock)",
+          severity: "warning",
+          cause: "Nozzle needle is sticking open or nozzle tip has carbon buildup, dumping un-atomized liquid diesel stream into pre-cup, causing explosive detonation.",
+          fix: "Remove injector holder for that cylinder. Pop-test opening pressure (145-155 kg/cm²) and replace nozzle tip (DN4PD57).",
+          procedureRef: "injector-nozzle-service"
+        }
+      },
+      {
+        label: "No, loud knocking is heard across all cylinders and engine is louder at cold start",
+        conclusion: {
+          title: "Excessively Advanced Static Injection Timing or Stuck ACSD",
+          severity: "warning",
+          cause: "VE pump static plunger stroke is advanced beyond 0.64 mm TDC, or Automatic Cold Start Device (ACSD) wax thermostat is stuck in advance mode.",
+          fix: "Perform dial gauge static timing adjustment (0.58-0.64 mm TDC). Check ACSD release pin.",
+          procedureRef: "injection-pump-timing"
+        }
+      }
+    ]
+  },
+  "noise-hunting-idle": {
+    id: "noise-hunting-idle",
+    category: "Engine Noise",
+    question: "Inspect clear fuel line or check primer pump for micro air bubbles. Is there air in the diesel supply?",
+    options: [
+      {
+        label: "Yes, tiny champagne bubbles visible in fuel line before injection pump",
+        conclusion: {
+          title: "Air Ingress Causing Governor Hunting",
+          severity: "info",
+          cause: "Air entering the suction line causes the mechanical flyweight governor inside the VE pump to oscillate back and forth trying to maintain idle RPM.",
+          fix: "Replace rubber fuel filter inlet hoses, install new copper washers on banjo bolts, and bleed fuel system."
+        }
+      },
+      {
+        label: "No air in fuel; occurs when headlights or A/C are switched on",
+        conclusion: {
+          title: "A/C Idle-Up VSV Diaphragm Out of Adjustment",
+          severity: "info",
+          cause: "The vacuum actuator on the side of the VE pump throttle arm is incorrectly adjusted.",
+          fix: "Adjust idle-up screw on throttle lever so engine holds 850 RPM with A/C compressor active."
+        }
+      }
+    ]
+  },
+  "noise-valve-tick": {
+    id: "noise-valve-tick",
+    category: "Engine Noise",
+    question: "Measure cold valve clearances with a feeler gauge. What are the lash measurements?",
+    expectedSpec: "Intake: 0.20 – 0.30 mm | Exhaust: 0.40 – 0.50 mm",
+    options: [
+      {
+        label: "One or more valves have excessive clearance (> 0.35mm Intake or > 0.55mm Exhaust)",
+        conclusion: {
+          title: "Excessive Valve Lash / Worn Adjusting Shim",
+          severity: "info",
+          cause: "Cam lobe impact against loose shim creates audible metallic ticking sound and reduces valve lift.",
+          fix: "Calculate required replacement shim using formula N = T + (A - Target) and install new Toyota shim using SST 09248-64011.",
+          procedureRef: "valve-clearance-adjustment"
+        }
+      }
+    ]
+  },
+  "noise-bottom-end-knock": {
+    id: "noise-bottom-end-knock",
+    category: "Engine Noise",
+    question: "Does the deep thudding knock increase dramatically in volume when engine is revved to 2,000 RPM under load?",
+    options: [
+      {
+        label: "Yes, heavy dull knock that vibrates the oil pan",
+        conclusion: {
+          title: "Worn Connecting Rod Big-End Bearing / Crankshaft Journal Damage",
+          severity: "critical",
+          cause: "Spun rod bearing or excessive oil clearance (>0.10mm) resulting from past oil starvation or low oil pressure.",
+          fix: "CRITICAL: Shut engine down immediately! Drop oil pan, measure crank journals, and install new tri-metal bearing shells."
+        }
+      }
+    ]
+  },
+
+  // ==========================================
+  // TREE 7: BRAKES & LSPV INBALANCE
+  // ==========================================
+  "start-node-brakes": {
+    id: "start-node-brakes",
+    category: "Brake System",
+    question: "What brake symptom is occurring on your 4Runner?",
+    options: [
+      { label: "Rear wheels lock up violently under moderate braking with empty cargo area", nextNodeId: "brakes-rear-lockup" },
+      { label: "Brake pedal is rock hard to push and stopping distance is huge", nextNodeId: "brakes-hard-pedal" },
+      { label: "Brake pedal feels spongy and sinks slowly to the floorboard", nextNodeId: "brakes-spongy-pedal" }
+    ]
+  },
+  "brakes-rear-lockup": {
+    id: "brakes-rear-lockup",
+    category: "Brake System",
+    question: "Has the vehicle received a suspension lift kit (e.g. 2-inch rear coil spring spacer or lifted springs)?",
+    options: [
+      {
+        label: "Yes, vehicle has a suspension lift installed",
+        conclusion: {
+          title: "Load Sensing Proportioning Valve (LSPV) Height Out of Calibration",
+          severity: "warning",
+          cause: "Lifting the rear chassis pulls the LSPV sensing spring UP, tricking the hydraulic valve into thinking the vehicle is fully loaded with 1,000 lbs of cargo, sending 100% full hydraulic pressure to the rear drum brakes!",
+          fix: "Install a raised drop bracket for the LSPV sensing rod on the rear axle housing or adjust the shackle spring bolt until rear line pressure is reduced to factory unladen curve.",
+          procedureRef: "lspv-brake-service"
+        }
+      },
+      {
+        label: "No, stock factory ride height; rear brake shoe self-adjuster is over-tightened",
+        conclusion: {
+          title: "Rear Drum Brake Shoe Drag / Contaminated Linings",
+          severity: "warning",
+          cause: "Rear wheel cylinder leaking brake fluid or axle seal leaking gear oil onto brake shoes.",
+          fix: "Replace rear wheel cylinders and install new brake shoes. Clean drum friction surface."
+        }
+      }
+    ]
+  },
+  "brakes-hard-pedal": {
+    id: "brakes-hard-pedal",
+    category: "Brake System",
+    question: "Is the alternator rear-mounted vacuum pump pulling at least 500 mmHg vacuum?",
+    testAction: "Connect vacuum gauge to the brake booster check valve line.",
+    options: [
+      {
+        label: "Vacuum gauge reads < 300 mmHg or 0 vacuum",
+        conclusion: {
+          title: "Alternator Rear Vane Vacuum Pump Failure",
+          severity: "critical",
+          cause: "Worn carbon vanes or oil starvation in the vacuum pump mounted to the back of the alternator.",
+          fix: "Rebuild alternator vacuum pump or replace alternator/pump assembly. Inspect oil supply and drain lines.",
+          procedureRef: "vacuum-wiring"
+        }
+      }
+    ]
+  },
+  "brakes-spongy-pedal": {
+    id: "brakes-spongy-pedal",
+    category: "Brake System",
+    question: "Was the Load Sensing Proportioning Valve (LSPV) bleeder valve opened during brake bleeding?",
+    options: [
+      {
+        label: "No, only the 4 wheel calipers and drums were bled",
+        conclusion: {
+          title: "Air Trapped Inside LSPV Hydraulic Chamber",
+          severity: "warning",
+          cause: "The LN130 has a 5th bleeder valve located directly on the LSPV body near the rear axle. Trapped air here creates a squishy pedal.",
+          fix: "Bleed system in official Toyota 5-point sequence: 1) LSPV Body &rarr; 2) Rear Left &rarr; 3) Rear Right &rarr; 4) Front Left &rarr; 5) Front Right.",
+          procedureRef: "lspv-brake-service"
         }
       }
     ]
