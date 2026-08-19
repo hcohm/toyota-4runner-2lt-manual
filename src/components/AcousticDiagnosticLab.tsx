@@ -100,6 +100,93 @@ const SOUND_PROFILES: EngineSoundProfile[] = [
   }
 ];
 
+// Helper to generate realistic PCM AudioBuffer for 2L-T Diesel sounds
+function generateDieselAudioBuffer(
+  ctx: AudioContext,
+  profileId: string
+): AudioBuffer {
+  const sampleRate = ctx.sampleRate;
+  const duration = 4.0; // 4 second seamless loop
+  const totalSamples = Math.floor(sampleRate * duration);
+  const buffer = ctx.createBuffer(1, totalSamples, sampleRate);
+  const channelData = buffer.getChannelData(0);
+
+  // Engine Physics Parameters (700 RPM Idle)
+  const engineRps = 700 / 60; // 11.666 revs/sec
+  const strokeFreq = engineRps * 2; // 23.333 firing pulses/sec (4 cylinders in 4-stroke)
+  const pulseIntervalSamples = sampleRate / strokeFreq; // ~1890 samples per stroke
+  const camIntervalSamples = sampleRate / (engineRps / 2); // ~7560 samples per cam cycle
+
+  for (let i = 0; i < totalSamples; i++) {
+    const t = i / sampleRate;
+
+    // 1. Deep Crankcase & Exhaust Rumble (Low Frequencies: 58Hz, 116Hz, 232Hz)
+    const baseRumble =
+      Math.sin(2 * Math.PI * (engineRps * 2) * t) * 0.25 +
+      Math.sin(2 * Math.PI * (engineRps * 4) * t) * 0.15 +
+      Math.sin(2 * Math.PI * (engineRps * 8) * t) * 0.08;
+
+    // 2. Pre-Combustion Chamber Diesel Clatter Pulse
+    const strokePos = i % pulseIntervalSamples;
+    const strokeFraction = strokePos / pulseIntervalSamples;
+    // Fast attack (10%), exponential decay (90%)
+    let clatterEnvelope = 0;
+    if (strokeFraction < 0.1) {
+      clatterEnvelope = strokeFraction / 0.1;
+    } else {
+      clatterEnvelope = Math.exp(-(strokeFraction - 0.1) * 7.0);
+    }
+
+    // Mechanical combustion snap (chattering resonance around 280Hz)
+    const clatterNoise =
+      (Math.random() * 2 - 1) * 0.15 * Math.sin(2 * Math.PI * 280 * t);
+    const combustionClatter = (Math.sin(2 * Math.PI * 240 * t) * 0.2 + clatterNoise) * clatterEnvelope;
+
+    let sample = baseRumble + combustionClatter;
+
+    // 3. Profile-Specific Fault Injection
+    if (profileId === 'valve-lash-tap') {
+      // Metallic High-Frequency Click at Camshaft Speed
+      const camPos = i % camIntervalSamples;
+      const camFraction = camPos / camIntervalSamples;
+      if (camFraction < 0.02) {
+        const clickEnv = Math.exp(-camFraction * 200);
+        const clickTone = Math.sin(2 * Math.PI * 1850 * t) * 0.45;
+        sample += clickTone * clickEnv;
+      }
+    } else if (profileId === 'injector-nail-knock') {
+      // Hard Hammering Detonation on Cylinder #1
+      const cyl1Pos = i % (pulseIntervalSamples * 4);
+      const cyl1Fraction = cyl1Pos / (pulseIntervalSamples * 4);
+      if (cyl1Fraction < 0.04) {
+        const knockEnv = Math.exp(-cyl1Fraction * 120);
+        const knockTone =
+          (Math.sin(2 * Math.PI * 850 * t) * 0.5 + (Math.random() * 2 - 1) * 0.2) *
+          knockEnv;
+        sample += knockTone * 0.7;
+      }
+    } else if (profileId === 'turbo-whistle-leak') {
+      // Escaping Air Hiss + Whistling Resonance
+      const hiss = (Math.random() * 2 - 1) * 0.12;
+      const whistle =
+        Math.sin(2 * Math.PI * (5200 + Math.sin(2 * Math.PI * 1.5 * t) * 300) * t) *
+        0.18;
+      sample = sample * 0.5 + (hiss + whistle) * 0.6;
+    } else if (profileId === 'vacuum-pump-whine') {
+      // Harmonic Bearing Whine
+      const whine =
+        Math.sin(2 * Math.PI * 3200 * t) * 0.18 +
+        Math.sin(2 * Math.PI * 1600 * t) * 0.12;
+      sample += whine;
+    }
+
+    // Soft limiter / clipping protection
+    channelData[i] = Math.max(-0.85, Math.min(0.85, sample * 0.6));
+  }
+
+  return buffer;
+}
+
 export const AcousticDiagnosticLab: React.FC = () => {
   const [selectedProfile, setSelectedProfile] = useState<EngineSoundProfile>(SOUND_PROFILES[0]);
   const [activeAudioMode, setActiveAudioMode] = useState<'idle' | 'synth' | 'recording' | 'playback' | 'live-mic'>('idle');
@@ -114,9 +201,8 @@ export const AcousticDiagnosticLab: React.FC = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
+  const activeBufferSourceRef = useRef<AudioBufferSourceNode | null>(null);
 
-  // Synth generators interval ref
-  const synthIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const liveMicStreamRef = useRef<MediaStream | null>(null);
@@ -145,7 +231,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
 
     if (!masterGainRef.current) {
       const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(isMuted ? 0 : 0.35, ctx.currentTime);
+      masterGain.gain.setValueAtTime(isMuted ? 0 : 0.45, ctx.currentTime);
       masterGain.connect(analyserRef.current);
       analyserRef.current.connect(ctx.destination);
       masterGainRef.current = masterGain;
@@ -160,10 +246,15 @@ export const AcousticDiagnosticLab: React.FC = () => {
 
   // Stop All Active Sounds & Streams
   const stopAllAudio = () => {
-    // Stop synth pulses
-    if (synthIntervalRef.current) {
-      clearInterval(synthIntervalRef.current);
-      synthIntervalRef.current = null;
+    // Stop active buffer source
+    if (activeBufferSourceRef.current) {
+      try {
+        activeBufferSourceRef.current.stop();
+        activeBufferSourceRef.current.disconnect();
+      } catch {
+        // Ignore
+      }
+      activeBufferSourceRef.current = null;
     }
 
     // Stop MediaRecorder
@@ -187,106 +278,24 @@ export const AcousticDiagnosticLab: React.FC = () => {
     setActiveAudioMode('idle');
   };
 
-  // 1. Play Synthetic Engine Sounds
+  // 1. Play Synthetic Engine Sounds via Procedural AudioBuffer
   const playSynthesizedProfile = async (profile: EngineSoundProfile) => {
     stopAllAudio();
     setMicError(null);
 
     try {
       const { ctx, masterGain } = await getAudioContext();
+      const audioBuffer = generateDieselAudioBuffer(ctx, profile.id);
+
+      const sourceNode = ctx.createBufferSource();
+      sourceNode.buffer = audioBuffer;
+      sourceNode.loop = true;
+
+      sourceNode.connect(masterGain);
+      sourceNode.start(0);
+
+      activeBufferSourceRef.current = sourceNode;
       setActiveAudioMode('synth');
-
-      if (profile.id === 'normal-idle') {
-        // Rhythmic Diesel Combustion Thumps (23 Hz pulse rate)
-        synthIntervalRef.current = setInterval(() => {
-          if (ctx.state === 'closed') return;
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(220, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.04);
-
-          gain.gain.setValueAtTime(0.4, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
-
-          osc.connect(gain);
-          gain.connect(masterGain);
-
-          osc.start();
-          osc.stop(ctx.currentTime + 0.05);
-        }, 43); // ~23 Hz = 700 RPM 4-cylinder firing
-      } else if (profile.id === 'valve-lash-tap') {
-        // High Frequency Metallic Ticks (1.8 kHz sharp tick at 11.6 Hz)
-        synthIntervalRef.current = setInterval(() => {
-          if (ctx.state === 'closed') return;
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(1850, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.02);
-
-          gain.gain.setValueAtTime(0.5, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.025);
-
-          osc.connect(gain);
-          gain.connect(masterGain);
-
-          osc.start();
-          osc.stop(ctx.currentTime + 0.03);
-        }, 86);
-      } else if (profile.id === 'injector-nail-knock') {
-        // Harsh Detonation Snaps (900 Hz square wave)
-        synthIntervalRef.current = setInterval(() => {
-          if (ctx.state === 'closed') return;
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-
-          osc.type = 'square';
-          osc.frequency.setValueAtTime(920, ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 0.035);
-
-          gain.gain.setValueAtTime(0.6, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
-
-          osc.connect(gain);
-          gain.connect(masterGain);
-
-          osc.start();
-          osc.stop(ctx.currentTime + 0.045);
-        }, 86);
-      } else if (profile.id === 'turbo-whistle-leak') {
-        // High Pitch Whistle (5.5 kHz)
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(5400, ctx.currentTime);
-        gain.gain.setValueAtTime(0.25, ctx.currentTime);
-
-        osc.connect(gain);
-        gain.connect(masterGain);
-        osc.start();
-
-        synthIntervalRef.current = setInterval(() => {
-          osc.frequency.setValueAtTime(5200 + Math.random() * 600, ctx.currentTime);
-        }, 80);
-      } else if (profile.id === 'vacuum-pump-whine') {
-        // Alternator / Vacuum Pump Harmonic Whine (3.4 kHz)
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(3200, ctx.currentTime);
-        gain.gain.setValueAtTime(0.22, ctx.currentTime);
-
-        osc.connect(gain);
-        gain.connect(masterGain);
-        osc.start();
-
-        synthIntervalRef.current = setInterval(() => {
-          osc.frequency.linearRampToValueAtTime(3200 + Math.sin(Date.now() * 0.003) * 400, ctx.currentTime + 0.05);
-        }, 50);
-      }
     } catch (err) {
       setMicError('Audio engine error: ' + (err instanceof Error ? err.message : String(err)));
       setActiveAudioMode('idle');
@@ -413,7 +422,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
   const toggleMute = () => {
     setIsMuted(!isMuted);
     if (masterGainRef.current && audioContextRef.current) {
-      masterGainRef.current.gain.setValueAtTime(!isMuted ? 0 : 0.35, audioContextRef.current.currentTime);
+      masterGainRef.current.gain.setValueAtTime(!isMuted ? 0 : 0.45, audioContextRef.current.currentTime);
     }
   };
 
@@ -559,7 +568,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
               2L-T Acoustic & Frequency Sound Diagnostic Lab
             </h2>
             <p className="text-sm text-gray-400 mt-1 max-w-3xl leading-relaxed">
-              Record live audio of your engine bay, play it back through the digital FFT spectrum analyzer, or synthesize reference failure frequencies for loose valve lash, injector nail-knock, and turbo boost whistle.
+              Record live audio of your engine bay, play it back through the digital FFT spectrum analyzer, or test authentic 2L-T reference diesel sounds for loose valve lash, injector nail-knock, and turbo boost whistle.
             </p>
           </div>
 
@@ -648,7 +657,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
                 : activeAudioMode === 'playback'
                 ? '▶ PLAYING BACK RECORDED ENGINE'
                 : activeAudioMode === 'synth'
-                ? '🔊 SYNTHETIC REFERENCE SOUND'
+                ? '🔊 DIESEL ENGINE AUDIO'
                 : activeAudioMode === 'live-mic'
                 ? '🎙 LIVE MIC MONITOR'
                 : 'STANDBY'}
@@ -686,7 +695,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
           {/* Sound Profiles Selector */}
           <div className="tech-panel p-4 bg-[#12161c] border-[#242e3c] space-y-2">
             <span className="text-[11px] font-mono text-gray-400 uppercase font-bold tracking-wider block mb-1">
-              Reference Sound Library (Click to Play):
+              2L-T Diesel Sound Library (Click to Play):
             </span>
 
             {SOUND_PROFILES.map((prof) => {
