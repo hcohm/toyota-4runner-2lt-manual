@@ -16,7 +16,8 @@ import {
   Sun,
   Layers,
   Menu,
-  X
+  X,
+  MapPin
 } from 'lucide-react';
 
 import { VehicleOverview } from './components/VehicleOverview';
@@ -32,6 +33,7 @@ import { ProcedureRunner } from './components/ProcedureRunner';
 import { VacuumWiringTracer } from './components/VacuumWiringTracer';
 import { FluidsMaintenance } from './components/FluidsMaintenance';
 import { QuickSearchModal } from './components/QuickSearchModal';
+import { ElectricalConnectorLocator } from './components/ElectricalConnectorLocator';
 
 type TabId =
   | 'overview'
@@ -39,6 +41,7 @@ type TabId =
   | 'valve-shim'
   | 'timing-belt'
   | 'super-glow'
+  | 'connector-locator'
   | 'cooling-crack'
   | 'drivetrain'
   | 'diagnostics'
@@ -58,6 +61,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: '1991 4Runner Specs & Decoder', shortLabel: 'Overview', icon: Truck, category: 'Reference' },
+  { id: 'connector-locator', label: 'Electronics & Connector Locator', shortLabel: 'Part Locator', icon: MapPin, category: 'Electrical', badge: 'Map & Pinouts' },
   { id: 'head-torque', label: '18-Bolt Head Torque Sequencer', shortLabel: 'Head Torque', icon: Wrench, category: 'Engine', badge: 'Interactive' },
   { id: 'valve-shim', label: 'Valve Lash Shim Calculator', shortLabel: 'Valve Shims', icon: Layers, category: 'Engine', badge: 'Calculator' },
   { id: 'timing-belt', label: 'Timing Belt & Gear Alignment', shortLabel: 'Timing Belt', icon: RotateCw, category: 'Engine' },
@@ -168,7 +172,7 @@ export function App() {
           </div>
           <div className="flex items-center gap-2 text-emerald-400 flex-shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>FSM RM520E / RM582E Verified</span>
+            <span>FSM RM520E / RM582E / EWD Verified</span>
           </div>
         </div>
       </header>
@@ -224,8 +228,8 @@ export function App() {
 
             {/* Quick Helper Alert in Sidebar */}
             <div className="mt-4 p-3 rounded-lg bg-[#181d24] border border-[#27303c] text-[11px] text-gray-400 leading-relaxed font-sans">
-              <strong className="text-amber-400 font-mono block mb-1">PRO-TIP:</strong>
-              Use the <strong className="text-white">Diagnostic Wizard</strong> to trace starting faults, coolant ejection, or smoke colors before opening engine components.
+              <strong className="text-cyan-400 font-mono block mb-1">PART LOCATOR:</strong>
+              Can't find a sensor or relay? Click <strong className="text-white">Part Locator</strong> to view exact vehicle positions, wire color stripes, and test voltages.
             </div>
           </div>
         </aside>
@@ -233,6 +237,7 @@ export function App() {
         {/* Center Main Dynamic Content View */}
         <main className="flex-1 min-w-0">
           {activeTab === 'overview' && <VehicleOverview />}
+          {activeTab === 'connector-locator' && <ElectricalConnectorLocator />}
           {activeTab === 'head-torque' && <HeadTorqueSimulator />}
           {activeTab === 'valve-shim' && <ValveShimCalculator />}
           {activeTab === 'timing-belt' && <TimingBeltVisualizer />}
