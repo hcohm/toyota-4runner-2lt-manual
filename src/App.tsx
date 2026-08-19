@@ -2,89 +2,95 @@ import React, { useState, useEffect } from 'react';
 import {
   Truck,
   Wrench,
-  Gauge,
-  RotateCw,
+  Fuel,
   Zap,
-  Flame,
-  Compass,
   Stethoscope,
-  BookOpen,
-  GitBranch,
-  Droplet,
+  Compass,
   Search,
   Moon,
   Sun,
-  Layers,
   Menu,
-  X,
-  MapPin,
-  Fuel,
-  FileText
+  X
 } from 'lucide-react';
 
-import { VehicleOverview } from './components/VehicleOverview';
-import { HeadTorqueSimulator } from './components/HeadTorqueSimulator';
-import { ValveShimCalculator } from './components/ValveShimCalculator';
-import { TimingBeltVisualizer } from './components/TimingBeltVisualizer';
-import { SuperGlowLab } from './components/SuperGlowLab';
-import { CoolingCrackPrevention } from './components/CoolingCrackPrevention';
-import { DrivetrainHub } from './components/DrivetrainHub';
-import { DiagnosticWizard } from './components/DiagnosticWizard';
-import { TorqueFinder } from './components/TorqueFinder';
-import { ProcedureRunner } from './components/ProcedureRunner';
-import { VacuumWiringTracer } from './components/VacuumWiringTracer';
-import { FluidsMaintenance } from './components/FluidsMaintenance';
-import { QuickSearchModal } from './components/QuickSearchModal';
-import { ElectricalConnectorLocator } from './components/ElectricalConnectorLocator';
+import { OverviewFsmHub } from './components/hubs/OverviewFsmHub';
+import { EngineHub } from './components/hubs/EngineHub';
 import { FuelSystemHub } from './components/FuelSystemHub';
-import { MasterManualHub } from './components/MasterManualHub';
+import { ElectricalHub } from './components/hubs/ElectricalHub';
+import { DiagnosticsHub } from './components/hubs/DiagnosticsHub';
+import { TrailOverlandingHub } from './components/hubs/TrailOverlandingHub';
+import { QuickSearchModal } from './components/QuickSearchModal';
 
-type TabId =
-  | 'overview'
-  | 'master-manual'
-  | 'fuel-system'
-  | 'head-torque'
-  | 'valve-shim'
-  | 'timing-belt'
-  | 'super-glow'
-  | 'connector-locator'
-  | 'cooling-crack'
-  | 'drivetrain'
+type HubId =
+  | 'overview-fsm'
+  | 'engine'
+  | 'fuel'
+  | 'electrical'
   | 'diagnostics'
-  | 'torque-finder'
-  | 'procedures'
-  | 'vacuum-wiring'
-  | 'fluids';
+  | 'trail';
 
-interface NavItem {
-  id: TabId;
+interface HubNavItem {
+  id: HubId;
   label: string;
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
-  category: 'Engine' | 'Fuel & Turbo' | 'Electrical' | 'Chassis & 4WD' | 'Diagnostics' | 'Reference';
   badge?: string;
+  description: string;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  { id: 'overview', label: '1991 4Runner Specs & Decoder', shortLabel: 'Overview', icon: Truck, category: 'Reference' },
-  { id: 'master-manual', label: 'Master FSM & Haynes Overhaul Manual', shortLabel: 'Master FSM', icon: FileText, category: 'Reference', badge: 'Chapters 1-5' },
-  { id: 'fuel-system', label: 'Mechanical Fuel Circuit & Suction Lines', shortLabel: 'Fuel Circuit', icon: Fuel, category: 'Fuel & Turbo', badge: 'Suction Lab' },
-  { id: 'connector-locator', label: 'Electronics & Connector Locator', shortLabel: 'Part Locator', icon: MapPin, category: 'Electrical', badge: 'Photos' },
-  { id: 'head-torque', label: '18-Bolt Head Torque Sequencer', shortLabel: 'Head Torque', icon: Wrench, category: 'Engine', badge: 'Interactive' },
-  { id: 'valve-shim', label: 'Valve Lash Shim Calculator', shortLabel: 'Valve Shims', icon: Layers, category: 'Engine', badge: 'Calculator' },
-  { id: 'timing-belt', label: 'Timing Belt & Gear Alignment', shortLabel: 'Timing Belt', icon: RotateCw, category: 'Engine' },
-  { id: 'cooling-crack', label: 'Cooling & Head Anti-Crack Hub', shortLabel: 'Cooling & Crack', icon: Flame, category: 'Engine', badge: 'Critical' },
-  { id: 'super-glow', label: 'Super Glow II Multimeter Lab', shortLabel: 'Super Glow', icon: Zap, category: 'Electrical', badge: 'Simulator' },
-  { id: 'vacuum-wiring', label: 'Vacuum Lines & Wiring Tracer', shortLabel: 'Vacuum / Wire', icon: GitBranch, category: 'Electrical' },
-  { id: 'drivetrain', label: '4WD Drivetrain & 8-Zerk Lube', shortLabel: '4WD Drivetrain', icon: Compass, category: 'Chassis & 4WD' },
-  { id: 'diagnostics', label: 'Interactive Diagnostic Wizard', shortLabel: 'Diagnostics', icon: Stethoscope, category: 'Diagnostics', badge: 'Wizard' },
-  { id: 'procedures', label: 'Step-by-Step Workshop Runner', shortLabel: 'Procedures', icon: BookOpen, category: 'Reference', badge: '12 Guides' },
-  { id: 'torque-finder', label: 'Master Fastener & Torque Finder', shortLabel: 'Torque DB', icon: Gauge, category: 'Reference' },
-  { id: 'fluids', label: 'Fluids & Maintenance Schedule', shortLabel: 'Fluids / Svc', icon: Droplet, category: 'Reference' },
+const HUB_NAV_ITEMS: HubNavItem[] = [
+  {
+    id: 'overview-fsm',
+    label: 'Overview & Master FSM Manual',
+    shortLabel: 'Overview & FSM',
+    icon: Truck,
+    badge: 'Ch 1-5 Blueprint',
+    description: 'Vehicle specs, VIN decoder, machine shop tolerances & torque database.'
+  },
+  {
+    id: 'engine',
+    label: 'Engine & Powertrain Hub',
+    shortLabel: 'Engine & 3D',
+    icon: Wrench,
+    badge: '3D Digital Twin',
+    description: 'Interactive 3D exploded engine, 18-bolt torque sequencer & valve lash.'
+  },
+  {
+    id: 'fuel',
+    label: 'Mechanical Fuel & Suction Circuit',
+    shortLabel: 'Fuel Circuit',
+    icon: Fuel,
+    badge: 'Suction Lab',
+    description: '100% mechanical fuel lines, air ingress cavitation lab & bleeding.'
+  },
+  {
+    id: 'electrical',
+    label: 'Electrical & Circuit Sandbox',
+    shortLabel: 'Electrical & Wire',
+    icon: Zap,
+    badge: 'Live Circuit',
+    description: 'Photo connector locator, live ignition/relay sandbox & Super Glow II.'
+  },
+  {
+    id: 'diagnostics',
+    label: 'Diagnostics & Acoustic Sound Lab',
+    shortLabel: 'Audio Diagnostics',
+    icon: Stethoscope,
+    badge: 'Audio FFT',
+    description: 'Live microphone sound analyzer, 7-tree wizard & 12 workshop guides.'
+  },
+  {
+    id: 'trail',
+    label: 'Trail Rescue & Overlanding Hub',
+    shortLabel: 'Trail Rescue',
+    icon: Compass,
+    badge: 'Glovebox Log',
+    description: 'Drivetrain & tire physics, emergency field hacks & shim logbook.'
+  }
 ];
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<TabId>('overview');
+  const [activeHub, setActiveHub] = useState<HubId>('overview-fsm');
   const [targetProcedureId, setTargetProcedureId] = useState<string | undefined>(undefined);
   const [searchOpen, setSearchOpen] = useState<boolean>(false);
   const [garageMode, setGarageMode] = useState<boolean>(false);
@@ -103,9 +109,21 @@ export function App() {
   }, []);
 
   const handleNavigate = (tabId: string, itemRef?: string) => {
-    setActiveTab(tabId as TabId);
-    if (tabId === 'procedures' && itemRef) {
-      setTargetProcedureId(itemRef);
+    if (tabId === 'master-manual' || tabId === 'torque-finder' || tabId === 'fluids') {
+      setActiveHub('overview-fsm');
+    } else if (tabId === 'head-torque' || tabId === 'valve-shim' || tabId === 'timing-belt' || tabId === 'cooling-crack') {
+      setActiveHub('engine');
+    } else if (tabId === 'fuel-system') {
+      setActiveHub('fuel');
+    } else if (tabId === 'connector-locator' || tabId === 'super-glow' || tabId === 'vacuum-wiring') {
+      setActiveHub('electrical');
+    } else if (tabId === 'diagnostics' || tabId === 'procedures') {
+      setActiveHub('diagnostics');
+      if (itemRef) setTargetProcedureId(itemRef);
+    } else if (tabId === 'drivetrain') {
+      setActiveHub('trail');
+    } else {
+      setActiveHub(tabId as HubId);
     }
     setMobileMenuOpen(false);
   };
@@ -117,7 +135,7 @@ export function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           {/* Logo & Model Brand */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveTab('overview')}>
+          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveHub('overview-fsm')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center text-white shadow-lg border border-red-500/40">
               <span className="font-mono font-black text-sm">2L-T</span>
             </div>
@@ -127,7 +145,7 @@ export function App() {
                 <span className="badge-toyota text-[10px] py-0 px-1.5 hidden sm:inline-flex">1991 LN130</span>
               </div>
               <div className="text-[11px] font-mono text-gray-400">
-                2.4L Turbo-Diesel Interactive Repair Manual
+                2.4L Turbo-Diesel Master Workshop & Engineering Suite
               </div>
             </div>
           </div>
@@ -173,14 +191,14 @@ export function App() {
         {/* Quick Ticker Sub-Header */}
         <div className="bg-[#101317] border-t border-[#1e232b] px-4 py-1.5 text-[11px] font-mono text-gray-400 overflow-x-auto flex items-center justify-between gap-6 max-w-7xl mx-auto">
           <div className="flex items-center gap-4 flex-shrink-0">
+            <span><strong className="text-gray-300">Architecture:</strong> 6 Master Hubs</span>
             <span><strong className="text-gray-300">Fuel System:</strong> 100% Mechanical Suction (No in-tank pump)</span>
             <span><strong className="text-gray-300">Head Torque:</strong> 78 Nm + 90° + 90°</span>
-            <span><strong className="text-gray-300">Valve Lash (Cold):</strong> In 0.25mm / Ex 0.45mm</span>
             <span><strong className="text-gray-300">Max Safe EGT:</strong> &lt; 650°C</span>
           </div>
           <div className="flex items-center gap-2 text-emerald-400 flex-shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>FSM RM520E / RM582E / EWD Verified</span>
+            <span>FSM RM520E / RM582E Verified</span>
           </div>
         </div>
       </header>
@@ -188,7 +206,7 @@ export function App() {
       {/* Main App Body with Sidebar & Content Area */}
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
         
-        {/* Left Desktop Sidebar Navigation */}
+        {/* Left Desktop Sidebar Navigation (6 Master Hubs) */}
         <aside
           className={`lg:w-64 flex-shrink-0 space-y-1 ${
             mobileMenuOpen ? 'block' : 'hidden lg:block'
@@ -196,78 +214,67 @@ export function App() {
         >
           <div className="tech-panel p-3 bg-[#13161a] sticky top-28 space-y-1">
             <span className="text-[10px] font-mono uppercase font-bold text-gray-500 px-3 py-1 block">
-              Workshop Modules
+              6 Master Workshop Hubs
             </span>
 
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
+            {HUB_NAV_ITEMS.map((hub) => {
+              const Icon = hub.icon;
+              const isActive = activeHub === hub.id;
               return (
                 <button
-                  key={item.id}
+                  key={hub.id}
                   onClick={() => {
-                    setActiveTab(item.id);
+                    setActiveHub(hub.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg text-xs font-mono flex items-center justify-between transition-all ${
+                  className={`w-full text-left p-3 rounded-xl border text-xs font-mono transition-all ${
                     isActive
-                      ? 'bg-red-600 text-white font-bold shadow-md shadow-red-950/50'
-                      : 'text-gray-400 hover:text-white hover:bg-[#1c222b]'
+                      ? 'bg-red-600 border-red-500 text-white font-bold shadow-lg shadow-red-950/60'
+                      : 'border-[#222b37] bg-[#14181f] text-gray-300 hover:border-gray-500'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-400'}`} />
-                    <span>{item.shortLabel}</span>
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <div className="flex items-center gap-2">
+                      <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-white' : 'text-red-500'}`} />
+                      <span className="font-bold text-sm text-white">{hub.shortLabel}</span>
+                    </div>
+                    {hub.badge && (
+                      <span
+                        className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : 'bg-[#1b222d] text-gray-300'
+                        }`}
+                      >
+                        {hub.badge}
+                      </span>
+                    )}
                   </div>
-                  {item.badge && (
-                    <span
-                      className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${
-                        isActive
-                          ? 'bg-white/20 text-white'
-                          : 'bg-[#212730] text-gray-300'
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                  )}
+                  <p className={`text-[10px] line-clamp-1 font-sans ${isActive ? 'text-white/90' : 'text-gray-400'}`}>
+                    {hub.description}
+                  </p>
                 </button>
               );
             })}
 
-            {/* Quick Helper Alert in Sidebar */}
+            {/* Helper callout */}
             <div className="mt-4 p-3 rounded-lg bg-[#181d24] border border-[#27303c] text-[11px] text-gray-400 leading-relaxed font-sans">
-              <strong className="text-amber-400 font-mono block mb-1">HAYNES DEPTH:</strong>
-              Check the <strong className="text-white">Master FSM Manual</strong> for complete machine-shop wear limits, Plastigage clearances, and rebuild tolerances.
+              <strong className="text-cyan-400 font-mono block mb-1">UNCLUTTERED HUBS:</strong>
+              Every hub features dedicated sub-tabs for deep tools, 3D simulations, audio spectrum analysis, and workshop procedures.
             </div>
           </div>
         </aside>
 
         {/* Center Main Dynamic Content View */}
         <main className="flex-1 min-w-0">
-          {activeTab === 'overview' && <VehicleOverview />}
-          {activeTab === 'master-manual' && <MasterManualHub />}
-          {activeTab === 'fuel-system' && <FuelSystemHub />}
-          {activeTab === 'connector-locator' && <ElectricalConnectorLocator />}
-          {activeTab === 'head-torque' && <HeadTorqueSimulator />}
-          {activeTab === 'valve-shim' && <ValveShimCalculator />}
-          {activeTab === 'timing-belt' && <TimingBeltVisualizer />}
-          {activeTab === 'cooling-crack' && <CoolingCrackPrevention />}
-          {activeTab === 'super-glow' && <SuperGlowLab />}
-          {activeTab === 'vacuum-wiring' && <VacuumWiringTracer />}
-          {activeTab === 'drivetrain' && <DrivetrainHub />}
-          {activeTab === 'diagnostics' && (
-            <DiagnosticWizard
-              onSelectProcedure={(procId) => {
-                setTargetProcedureId(procId);
-                setActiveTab('procedures');
-              }}
-            />
+          {activeHub === 'overview-fsm' && <OverviewFsmHub />}
+          {activeHub === 'engine' && <EngineHub />}
+          {activeHub === 'fuel' && <FuelSystemHub />}
+          {activeHub === 'electrical' && <ElectricalHub />}
+          {activeHub === 'diagnostics' && (
+            <DiagnosticsHub initialProcedureId={targetProcedureId} />
           )}
-          {activeTab === 'procedures' && (
-            <ProcedureRunner initialProcedureId={targetProcedureId} />
-          )}
-          {activeTab === 'torque-finder' && <TorqueFinder />}
-          {activeTab === 'fluids' && <FluidsMaintenance />}
+          {activeHub === 'trail' && <TrailOverlandingHub />}
         </main>
       </div>
 
@@ -282,7 +289,7 @@ export function App() {
       <footer className="mt-auto bg-[#0b0d10] border-t border-[#1f242c] py-6 px-4 text-center text-xs font-mono text-gray-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            1991 Toyota 4Runner / Hilux Surf (LN130 Chassis / 2L-T 2.4L Turbo Diesel) Interactive Repair Suite
+            1991 Toyota 4Runner / Hilux Surf (LN130 Chassis / 2L-T 2.4L Turbo Diesel) Interactive Engineering Suite
           </div>
           <div className="flex items-center gap-3">
             <span>Toyota FSM Specifications</span>
