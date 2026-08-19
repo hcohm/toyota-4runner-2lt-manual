@@ -345,21 +345,59 @@ export const FuelSystemHub: React.FC = () => {
               </span>
             </div>
 
-            {/* Visual Hose Animation */}
-            <div className="relative h-12 bg-gradient-to-r from-amber-950 via-amber-900 to-amber-950 rounded-full border-2 border-cyan-500/60 overflow-hidden flex items-center px-4 shadow-inner">
+            {/* Photorealistic Clear Vinyl Fuel Hose Animation */}
+            <div className="relative h-16 bg-[#0c130f] rounded-2xl border-2 border-[#2b4438] overflow-hidden flex items-center px-4 shadow-2xl relative">
+              {/* Braided clear PVC reinforcement pattern */}
+              <div
+                className="absolute inset-0 opacity-20 pointer-events-none"
+                style={{
+                  backgroundImage: `radial-gradient(circle, #34d399 1px, transparent 1px)`,
+                  backgroundSize: '12px 12px'
+                }}
+              />
+
+              {/* Glowing Diesel Fluid Base */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#064e3b]/80 via-[#047857]/60 to-[#064e3b]/80" />
+
               {simulatedCavitation ? (
-                <div className="w-full flex items-center justify-around animate-pulse">
-                  {[...Array(12)].map((_, i) => (
-                    <span
-                      key={i}
-                      className="w-3 h-3 rounded-full bg-white/80 shadow-md animate-bounce"
-                      style={{ animationDelay: `${i * 0.1}s` }}
-                    />
-                  ))}
+                <div className="relative w-full h-full flex items-center overflow-hidden">
+                  {/* High velocity fluid turbulence streaks */}
+                  <div className="absolute inset-0 bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.15)_50%,transparent_100%)] animate-pulse" />
+
+                  {/* Multitude of micro and macro cavitation bubbles */}
+                  {[...Array(24)].map((_, i) => {
+                    const size = 3 + ((i * 7) % 8);
+                    const speed = 0.8 + ((i * 3) % 10) * 0.1;
+                    const topPos = 20 + ((i * 13) % 60);
+                    return (
+                      <span
+                        key={i}
+                        className="absolute rounded-full bg-white/90 shadow-[0_0_8px_rgba(255,255,255,0.8)] border border-cyan-200"
+                        style={{
+                          width: `${size}px`,
+                          height: `${size}px`,
+                          top: `${topPos}%`,
+                          left: `${(i * 4.2) % 100}%`,
+                          animation: `bounce ${speed}s infinite alternate ease-in-out`
+                        }}
+                      />
+                    );
+                  })}
+                  <div className="absolute right-4 text-[10px] font-mono font-bold text-red-300 bg-red-950/80 px-2 py-0.5 rounded border border-red-800 backdrop-blur-sm shadow">
+                    CAVITATION FOAM ACTIVE
+                  </div>
                 </div>
               ) : (
-                <div className="w-full h-full bg-amber-600/30 flex items-center justify-center">
-                  <span className="text-[11px] font-mono text-amber-200">100% Solid Liquid Diesel (Zero Bubbles)</span>
+                <div className="relative w-full h-full flex items-center justify-between px-2">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
+                    <span className="text-xs font-mono font-bold text-emerald-200">
+                      Solid Laminar Diesel Stream (0.0% Aeration)
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800">
+                    Normal Suction Flow
+                  </span>
                 </div>
               )}
             </div>

@@ -107,14 +107,19 @@ export const AcousticDiagnosticLab: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const synthNodesRef = useRef<{ osc: OscillatorNode; gain: GainNode } | null>(null);
+  const synthNodesRef = useRef<{ osc: OscillatorNode; gain: GainNode; interval?: number } | null>(null);
   const micStreamRef = useRef<MediaStream | null>(null);
 
-  // Initialize Audio Context & Visualizer Loop
+  // Peak hold array for equalizer bars
+  const peakHoldRef = useRef<number[]>(new Array(64).fill(0));
+
+  // Initialize Audio Context & High-End Oscilloscope Render Loop
   useEffect(() => {
     let animationFrameId: number;
+    let tick = 0;
 
-    const renderSpectrum = () => {
+    const render = () => {
+      tick++;
       const canvas = canvasRef.current;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
@@ -123,58 +128,124 @@ export const AcousticDiagnosticLab: React.FC = () => {
       const width = canvas.width;
       const height = canvas.height;
 
-      ctx.clearRect(0, 0, width, height);
+      // Dark CRT Reticle Background
+      ctx.fillStyle = '#060a0f';
+      ctx.fillRect(0, 0, width, height);
 
-      // Draw Grid Background
-      ctx.strokeStyle = '#1a222d';
+      // Draw Oscilloscope Grid Lines (PicoScope Reticle Style)
+      ctx.strokeStyle = 'rgba(20, 80, 120, 0.25)';
       ctx.lineWidth = 1;
-      for (let y = 0; y < height; y += 30) {
+      const gridStep = 32;
+      for (let x = 0; x < width; x += gridStep) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < height; y += gridStep) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
       }
 
-      if (analyserRef.current && (isPlayingSynth || isMicActive)) {
+      // Center Reference Crosshairs
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(0, height / 2);
+      ctx.lineTo(width, height / 2);
+      ctx.moveTo(width / 2, 0);
+      ctx.lineTo(width / 2, height);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      const isLive = analyserRef.current && (isPlayingSynth || isMicActive);
+
+      if (isLive && analyserRef.current) {
+        // 1. Draw Real-Time Frequency Bars with Peak-Hold Decay
         const bufferLength = analyserRef.current.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-        analyserRef.current.getByteFrequencyData(dataArray);
+        const freqData = new Uint8Array(bufferLength);
+        analyserRef.current.getByteFrequencyData(freqData);
 
-        const barWidth = (width / bufferLength) * 2.5;
-        let x = 0;
+        const numBars = 48;
+        const barWidth = width / numBars;
 
-        for (let i = 0; i < bufferLength; i++) {
-          const barHeight = (dataArray[i] / 255) * (height - 20);
+        for (let i = 0; i < numBars; i++) {
+          const val = freqData[i * 2] || 0;
+          const barHeight = (val / 255) * (height * 0.75);
 
-          // Color gradient based on frequency
-          const hue = 200 - (i / bufferLength) * 180;
-          ctx.fillStyle = `hsl(${hue}, 90%, 55%)`;
+          // Update Peak Hold
+          if (barHeight > (peakHoldRef.current[i] || 0)) {
+            peakHoldRef.current[i] = barHeight;
+          } else {
+            peakHoldRef.current[i] = Math.max(0, (peakHoldRef.current[i] || 0) - 1.2);
+          }
 
-          ctx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
-          x += barWidth;
+          // Glowing Frequency Bar Gradient
+          const grad = ctx.createLinearGradient(0, height, 0, height - barHeight);
+          grad.addColorStop(0, 'rgba(14, 165, 233, 0.8)');
+          grad.addColorStop(0.6, 'rgba(56, 189, 248, 0.9)');
+          grad.addColorStop(1, 'rgba(244, 63, 94, 0.9)');
+
+          ctx.fillStyle = grad;
+          ctx.fillRect(i * barWidth + 2, height - barHeight, barWidth - 4, barHeight);
+
+          // Peak Hold Needle
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(i * barWidth + 2, height - (peakHoldRef.current[i] || 0) - 2, barWidth - 4, 2);
         }
+
+        // 2. Overlay Phosphor-Glow Time Domain Oscilloscope Waveform
+        const timeData = new Uint8Array(bufferLength);
+        analyserRef.current.getByteTimeDomainData(timeData);
+
+        ctx.save();
+        ctx.strokeStyle = '#38bdf8';
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = '#0284c7';
+        ctx.shadowBlur = 12;
+
+        ctx.beginPath();
+        const sliceWidth = width / bufferLength;
+        let wx = 0;
+        for (let i = 0; i < bufferLength; i++) {
+          const v = timeData[i] / 128.0;
+          const wy = (v * (height / 2)) - 10;
+
+          if (i === 0) ctx.moveTo(wx, wy);
+          else ctx.lineTo(wx, wy);
+          wx += sliceWidth;
+        }
+        ctx.stroke();
+        ctx.restore();
+
       } else {
-        // Static Placeholder Waveform
-        ctx.fillStyle = '#38bdf840';
+        // Standby Animated Radar Trace
+        ctx.save();
         ctx.strokeStyle = '#38bdf8';
         ctx.lineWidth = 2;
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 8;
         ctx.beginPath();
-        for (let x = 0; x < width; x += 5) {
-          const y = height / 2 + Math.sin(x * 0.05) * 15;
+        for (let x = 0; x < width; x += 4) {
+          const y = height / 2 + Math.sin(x * 0.04 + tick * 0.05) * 16 * Math.sin(tick * 0.02);
           if (x === 0) ctx.moveTo(x, y);
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
+        ctx.restore();
 
+        // Standby Text HUD
         ctx.fillStyle = '#64748b';
         ctx.font = '11px monospace';
-        ctx.fillText('Press "Play Acoustic Synthesis" or "Start Live Mic" to analyze frequencies', 20, height - 20);
+        ctx.fillText('STANDBY: Click "Play Audio Synthesis" or "Start Live Mic" to analyze acoustic waveform', 24, height - 24);
       }
 
-      animationFrameId = requestAnimationFrame(renderSpectrum);
+      animationFrameId = requestAnimationFrame(render);
     };
 
-    renderSpectrum();
+    render();
 
     return () => {
       cancelAnimationFrame(animationFrameId);
@@ -183,7 +254,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
     };
   }, [isPlayingSynth, isMicActive]);
 
-  // Start Sound Synthesis
+  // Start Sound Synthesis with Realistic Diesel Engine Modulations
   const startSynth = (profile: EngineSoundProfile) => {
     stopMic();
     stopSynth();
@@ -203,8 +274,8 @@ export const AcousticDiagnosticLab: React.FC = () => {
     osc.type = profile.category === 'Normal' ? 'sawtooth' : profile.category === 'Valvetrain' ? 'triangle' : 'square';
     osc.frequency.setValueAtTime(targetFreq, ctx.currentTime);
 
-    // Modulation for rhythmic engine pulse
-    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    // Dynamic Rhythmic Engine Thump Modulation
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
 
     osc.connect(gain);
     gain.connect(analyser);
@@ -270,7 +341,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="badge-toyota">Web Audio API Acoustic FFT Analyzer</span>
+              <span className="badge-toyota">Automotive Oscilloscope FFT Spectrum</span>
               <span className="badge-spec flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-purple-400" /> "Listen to My 2L-T"
               </span>
@@ -280,7 +351,7 @@ export const AcousticDiagnosticLab: React.FC = () => {
               2L-T Acoustic & Frequency Sound Diagnostic Lab
             </h2>
             <p className="text-sm text-gray-400 mt-1 max-w-3xl leading-relaxed">
-              Identify mechanical diesel faults by sound frequency signatures. Use your microphone in the engine bay or play reference waveforms to differentiate normal idle clatter from loose valve lash, injector nail-knock, and turbo leaks.
+              Automotive-grade FFT spectrum analyzer and dual-trace oscilloscope. Analyze live engine bay sounds via your device microphone or test synthesized reference frequencies.
             </p>
           </div>
 
@@ -331,19 +402,19 @@ export const AcousticDiagnosticLab: React.FC = () => {
       {/* Main Workspace Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* FFT Spectrum Display (2 Columns) */}
-        <div className="lg:col-span-2 tech-panel bg-[#0b0e12] border-[#222b37] p-5 space-y-4">
+        <div className="lg:col-span-2 tech-panel bg-[#090d12] border-[#222b37] p-5 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-[#1f2733]">
             <span className="text-xs font-mono font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
               <Radio className="w-4 h-4 text-purple-400" />
-              Real-Time Fast Fourier Transform (FFT) Frequency Spectrum
+              Dual-Channel Digital Oscilloscope & 48-Band FFT Analyzer
             </span>
             <span className="badge-spec text-[10px] font-mono">
-              {isMicActive ? '🎙️ Live Microphone Input' : isPlayingSynth ? '🔊 Audio Synthesizer' : 'Idle'}
+              {isMicActive ? '🎙️ Live Microphone Input' : isPlayingSynth ? '🔊 Audio Synthesizer' : 'Standby'}
             </span>
           </div>
 
           {/* Canvas Spectrum */}
-          <div className="rounded-xl overflow-hidden border border-[#212b37] bg-[#07090c] relative">
+          <div className="rounded-xl overflow-hidden border border-[#212b37] bg-[#040608] relative shadow-inner">
             <canvas ref={canvasRef} width={680} height={260} className="w-full h-64" />
           </div>
 

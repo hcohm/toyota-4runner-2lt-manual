@@ -5,7 +5,10 @@ import {
   Eye,
   Sparkles,
   Maximize2,
-  RefreshCw
+  RefreshCw,
+  Flame,
+  Droplet,
+  Zap
 } from 'lucide-react';
 
 interface EngineLayer {
@@ -16,7 +19,7 @@ interface EngineLayer {
   torqueSpec: string;
   yOffsetFactor: number;
   color: string;
-  glowColor: string;
+  accentColor: string;
   description: string;
 }
 
@@ -25,67 +28,67 @@ const ENGINE_LAYERS: EngineLayer[] = [
     id: 'valve-cover',
     name: 'Cast Aluminum Valve Cover & PCV Baffle',
     oemPartNo: '11201-54070',
-    material: 'Die-cast Aluminum with Half-Moon Rubber Plugs',
+    material: 'Die-cast Aluminum with Ribbed Baffle',
     torqueSpec: '8.0 Nm (71 in-lb)',
-    yOffsetFactor: -120,
-    color: '#3a424e',
-    glowColor: '#60a5fa',
-    description: 'Seals valvetrain oil spray and routes blowby crankcase gases through oil separator to turbo inlet duct.'
+    yOffsetFactor: -130,
+    color: '#475569',
+    accentColor: '#94a3b8',
+    description: 'Ribbed aluminum cover sealing overhead valvetrain with integrated oil baffle and breather nozzle.'
   },
   {
     id: 'camshaft',
-    name: 'SOHC Camshaft & 5x Bearing Caps',
+    name: 'SOHC Camshaft & 8 Induction-Hardened Lobes',
     oemPartNo: '13501-54070',
-    material: 'Chilled Cast Iron with Induction Hardened Lobes',
-    torqueSpec: 'Bearing Caps: 18 Nm (13 ft-lb) | Cam Bolt: 98 Nm',
-    yOffsetFactor: -80,
-    color: '#8b9bb4',
-    glowColor: '#38bdf8',
-    description: 'Direct-actuation overhead camshaft running over 8 bucket followers with top-mounted adjusting shims.'
+    material: 'Chilled Cast Iron / Hardened Steel Lobes',
+    torqueSpec: 'Bearing Caps: 18 Nm | Cam Bolt: 98 Nm',
+    yOffsetFactor: -90,
+    color: '#64748b',
+    accentColor: '#38bdf8',
+    description: 'Direct-actuation camshaft with 8 eccentric lobes and 5 precision-ground bearing journals.'
   },
   {
     id: 'lifters-shims',
-    name: '8x Bucket Lifters & 2.50–3.30mm Adjusting Shims',
+    name: '8x Bucket Lifters & Precision Ground Shims',
     oemPartNo: '13751-54010',
-    material: 'Case-Hardened Alloy Steel',
-    torqueSpec: 'Cold Lash: In 0.20-0.30mm | Ex 0.40-0.50mm',
-    yOffsetFactor: -50,
-    color: '#cbd5e1',
-    glowColor: '#a855f7',
-    description: 'Precision ground outer shims available in 17 official Toyota 0.05mm increments for exact valve lash setting.'
+    material: 'Hardened Alloy Steel (2.50 - 3.30mm)',
+    torqueSpec: 'Cold Lash: In 0.25mm / Ex 0.45mm',
+    yOffsetFactor: -55,
+    color: '#94a3b8',
+    accentColor: '#c084fc',
+    description: 'Cylindrical bucket followers with stamped top adjusting shims directly above valve stems.'
   },
   {
     id: 'cylinder-head',
-    name: 'SOHC 8-Valve Cylinder Head & Swirl Pre-Chambers',
+    name: 'Cast Iron Cylinder Head & Swirl Pre-Chambers',
     oemPartNo: '11101-54121',
-    material: 'High-Nickel Grey Cast Iron with Ceramic Pre-Chamber Inserts',
+    material: 'High-Nickel Grey Cast Iron + Ceramic Pre-Cups',
     torqueSpec: '18 Bolts: 78 Nm + 90° + 90° (Criss-Cross)',
-    yOffsetFactor: -20,
-    color: '#475569',
-    glowColor: '#ef4444',
-    description: 'Features cross-flow intake/exhaust ports and Ricardo Comet V swirl pre-combustion chambers containing glow plugs.'
+    yOffsetFactor: -15,
+    color: '#334155',
+    accentColor: '#f87171',
+    description: 'Cross-flow head featuring Ricardo Comet V swirl pre-combustion chambers and glow plug wells.'
   },
   {
     id: 'head-gasket',
     name: 'Multi-Layer Steel (MLS) Head Gasket (Grade B/D/F)',
     oemPartNo: '11115-54084-B/D/F',
-    material: 'Triple-Layer Stainless Steel with Viton Combustion Fire-Rings',
-    torqueSpec: 'Piston Protrusion Matched: 0.68 to 0.97 mm',
-    yOffsetFactor: 20,
+    material: 'Triple Stainless Steel with Viton Fire Rings',
+    torqueSpec: 'Matched to Piston Protrusion: 0.68-0.97mm',
+    yOffsetFactor: 25,
     color: '#b45309',
-    glowColor: '#f59e0b',
-    description: 'Selected strictly by deck piston protrusion at TDC to guarantee exact 22.2:1 compression ratio.'
+    accentColor: '#fbbf24',
+    description: 'Laser-cut steel gasket with 4 combustion fire rings and oil restrictor transfer orifice.'
   },
   {
     id: 'engine-block',
-    name: '2L-T Cast Iron Engine Block, Crankshaft & Pistons',
+    name: '2L-T Deep-Skirt Block, Pistons & Oil Squirters',
     oemPartNo: '11401-59195',
-    material: 'Deep-Skirt Cast Iron with Integrated Under-Piston Oil Squirters',
+    material: 'Cast Iron Deep-Skirt / Forged Crankshaft',
     torqueSpec: 'Main Caps: 103 Nm | Rods: 54 Nm + 90°',
-    yOffsetFactor: 60,
+    yOffsetFactor: 75,
     color: '#1e293b',
-    glowColor: '#10b981',
-    description: '92.0mm bore x 92.0mm stroke (2,446 cc) square architecture with forged steel crankshaft and oil cooling nozzles.'
+    accentColor: '#34d399',
+    description: '92mm square bore/stroke block with 4 cylinders, aluminum pistons, and under-crown cooling jets.'
   }
 ];
 
@@ -99,104 +102,6 @@ export const Engine3DVisualizer: React.FC = () => {
   const [xRayMode, setXRayMode] = useState<boolean>(false);
   const [isAutoRotating, setIsAutoRotating] = useState<boolean>(false);
   const [activeBoltStage, setActiveBoltStage] = useState<number>(1);
-
-  // Animation Loop for Canvas Rendering
-  useEffect(() => {
-    let animationFrameId: number;
-    let tick = 0;
-
-    const render = () => {
-      tick++;
-      if (isAutoRotating) {
-        setRotationAngle((prev) => (prev + 0.4) % 360);
-      }
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const width = canvas.width;
-      const height = canvas.height;
-      const centerX = width / 2;
-      const centerY = height / 2 - 10;
-
-      // Clear Canvas
-      ctx.clearRect(0, 0, width, height);
-
-      // Draw Grid / Workshop Floor
-      ctx.strokeStyle = '#1a222d';
-      ctx.lineWidth = 1;
-      const gridSize = 30;
-      for (let x = -300; x <= 300; x += gridSize) {
-        ctx.beginPath();
-        const start = project3D(x, 140, -300, rotationAngle, pitchAngle, centerX, centerY);
-        const end = project3D(x, 140, 300, rotationAngle, pitchAngle, centerX, centerY);
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-      }
-
-      // Draw Engine Layers in 3D Space (Ordered back to front)
-      ENGINE_LAYERS.forEach((layer) => {
-        const isSelected = selectedLayer.id === layer.id;
-        const explodedY = layer.yOffsetFactor * (explosionAmount / 35);
-
-        draw3DBlock(
-          ctx,
-          0,
-          explodedY,
-          0,
-          180, // width
-          28,  // height
-          130, // depth
-          layer.color,
-          layer.glowColor,
-          isSelected,
-          xRayMode,
-          rotationAngle,
-          pitchAngle,
-          centerX,
-          centerY
-        );
-
-        // Draw Fluid Flow Particles if Active
-        if (fluidFlowMode !== 'none') {
-          drawFluidFlowParticles(
-            ctx,
-            fluidFlowMode,
-            tick,
-            explodedY,
-            rotationAngle,
-            pitchAngle,
-            centerX,
-            centerY
-          );
-        }
-      });
-
-      // Draw 18 Cylinder Head Bolts when Head or Gasket is Selected
-      if (selectedLayer.id === 'cylinder-head' || selectedLayer.id === 'head-gasket' || explosionAmount > 10) {
-        draw18HeadBolts(
-          ctx,
-          explosionAmount,
-          activeBoltStage,
-          rotationAngle,
-          pitchAngle,
-          centerX,
-          centerY
-        );
-      }
-
-      animationFrameId = requestAnimationFrame(render);
-    };
-
-    render();
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [explosionAmount, rotationAngle, pitchAngle, selectedLayer, fluidFlowMode, xRayMode, isAutoRotating, activeBoltStage]);
 
   // 3D Projection Math Helper
   const project3D = (
@@ -219,8 +124,8 @@ export const Engine3DVisualizer: React.FC = () => {
     const y2 = y * Math.cos(pitch) - z1 * Math.sin(pitch);
     const z2 = y * Math.sin(pitch) + z1 * Math.cos(pitch);
 
-    // Isometric / Perspective Scale
-    const scale = 360 / (360 + z2 * 0.4);
+    // Perspective foreshortening
+    const scale = 400 / (400 + z2 * 0.35);
 
     return {
       x: cx + x1 * scale,
@@ -229,148 +134,595 @@ export const Engine3DVisualizer: React.FC = () => {
     };
   };
 
-  // Draw 3D Box for each Engine Component
-  const draw3DBlock = (
+  // Main Canvas Rendering Loop
+  useEffect(() => {
+    let animationFrameId: number;
+    let tick = 0;
+
+    const render = () => {
+      tick++;
+      if (isAutoRotating) {
+        setRotationAngle((prev) => (prev + 0.35) % 360);
+      }
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const cx = width / 2;
+      const cy = height / 2 - 10;
+
+      // Dark Industrial Background with Vignette
+      ctx.fillStyle = '#0a0d12';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw Floor Radial Shadow & Perspective Grid
+      drawFloorGrid(ctx, cx, cy, rotationAngle, pitchAngle);
+
+      // Render Each Component with Realistic Automotive Geometry
+      const scaleExplosion = explosionAmount / 35;
+
+      // 1. Engine Block (Bottom)
+      drawRealisticEngineBlock(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[5].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'engine-block',
+        xRayMode,
+        tick
+      );
+
+      // 2. Head Gasket
+      drawRealisticHeadGasket(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[4].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'head-gasket',
+        xRayMode
+      );
+
+      // 3. Cylinder Head & Pre-Chambers
+      drawRealisticCylinderHead(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[3].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'cylinder-head',
+        xRayMode,
+        fluidFlowMode,
+        tick
+      );
+
+      // 4. Lifters & Shims
+      drawRealisticLiftersShims(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[2].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'lifters-shims',
+        xRayMode
+      );
+
+      // 5. Camshaft & Sprocket
+      drawRealisticCamshaft(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[1].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'camshaft',
+        xRayMode,
+        tick
+      );
+
+      // 6. Valve Cover (Top)
+      drawRealisticValveCover(
+        ctx,
+        cx,
+        cy,
+        ENGINE_LAYERS[0].yOffsetFactor * scaleExplosion,
+        rotationAngle,
+        pitchAngle,
+        selectedLayer.id === 'valve-cover',
+        xRayMode
+      );
+
+      // 7. 18 Cylinder Head Bolts
+      if (selectedLayer.id === 'cylinder-head' || selectedLayer.id === 'head-gasket' || explosionAmount > 10) {
+        drawRealisticHeadBolts(
+          ctx,
+          cx,
+          cy,
+          ENGINE_LAYERS[3].yOffsetFactor * scaleExplosion,
+          explosionAmount,
+          activeBoltStage,
+          rotationAngle,
+          pitchAngle
+        );
+      }
+
+      // 8. Streamlined High-Tech Fluid Flow Pipes & Ribbons
+      if (fluidFlowMode !== 'none') {
+        drawFluidFlowStream(
+          ctx,
+          cx,
+          cy,
+          fluidFlowMode,
+          scaleExplosion,
+          rotationAngle,
+          pitchAngle,
+          tick
+        );
+      }
+
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [explosionAmount, rotationAngle, pitchAngle, selectedLayer, fluidFlowMode, xRayMode, isAutoRotating, activeBoltStage]);
+
+  // Draw Perspective Floor Grid
+  const drawFloorGrid = (
     ctx: CanvasRenderingContext2D,
-    bx: number,
-    by: number,
-    bz: number,
-    bw: number,
-    bh: number,
-    bd: number,
-    fillColor: string,
-    glowColor: string,
+    cx: number,
+    cy: number,
+    yaw: number,
+    pitch: number
+  ) => {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(30, 41, 59, 0.4)';
+    ctx.lineWidth = 1;
+    const gridSpan = 240;
+    const step = 40;
+
+    for (let x = -gridSpan; x <= gridSpan; x += step) {
+      const p1 = project3D(x, 150, -gridSpan, yaw, pitch, cx, cy);
+      const p2 = project3D(x, 150, gridSpan, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+    for (let z = -gridSpan; z <= gridSpan; z += step) {
+      const p1 = project3D(-gridSpan, 150, z, yaw, pitch, cx, cy);
+      const p2 = project3D(gridSpan, 150, z, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
+  // Helper to draw beveled isometric 3D component body with highlights
+  const renderBeveledBlock = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    w: number,
+    h: number,
+    d: number,
+    topColor: string,
+    frontColor: string,
+    sideColor: string,
     isSelected: boolean,
     isXRay: boolean,
     yaw: number,
-    pitch: number,
-    cx: number,
-    cy: number
+    pitch: number
   ) => {
-    const hw = bw / 2;
-    const hh = bh / 2;
-    const hd = bd / 2;
+    const hw = w / 2;
+    const hh = h / 2;
+    const hd = d / 2;
 
-    const vertices = [
-      project3D(bx - hw, by - hh, bz - hd, yaw, pitch, cx, cy), // 0: Top front left
-      project3D(bx + hw, by - hh, bz - hd, yaw, pitch, cx, cy), // 1: Top front right
-      project3D(bx + hw, by - hh, bz + hd, yaw, pitch, cx, cy), // 2: Top back right
-      project3D(bx - hw, by - hh, bz + hd, yaw, pitch, cx, cy), // 3: Top back left
-      project3D(bx - hw, by + hh, bz - hd, yaw, pitch, cx, cy), // 4: Bottom front left
-      project3D(bx + hw, by + hh, bz - hd, yaw, pitch, cx, cy), // 5: Bottom front right
-      project3D(bx + hw, by + hh, bz + hd, yaw, pitch, cx, cy), // 6: Bottom back right
-      project3D(bx - hw, by + hh, bz + hd, yaw, pitch, cx, cy)  // 7: Bottom back left
-    ];
-
-    // Faces: Top (0-1-2-3), Front (0-1-5-4), Right (1-2-6-5), Left (0-3-7-4), Back (3-2-6-7)
-    const faces = [
-      { indices: [0, 1, 2, 3], shade: 1.15 }, // Top
-      { indices: [0, 1, 5, 4], shade: 0.95 }, // Front
-      { indices: [1, 2, 6, 5], shade: 0.80 }, // Right
-      { indices: [0, 3, 7, 4], shade: 0.70 }  // Left
+    const v = [
+      project3D(-hw, y - hh, -hd, yaw, pitch, cx, cy), // 0: Top Front Left
+      project3D(hw, y - hh, -hd, yaw, pitch, cx, cy),  // 1: Top Front Right
+      project3D(hw, y - hh, hd, yaw, pitch, cx, cy),   // 2: Top Back Right
+      project3D(-hw, y - hh, hd, yaw, pitch, cx, cy),  // 3: Top Back Left
+      project3D(-hw, y + hh, -hd, yaw, pitch, cx, cy), // 4: Bottom Front Left
+      project3D(hw, y + hh, -hd, yaw, pitch, cx, cy),  // 5: Bottom Front Right
+      project3D(hw, y + hh, hd, yaw, pitch, cx, cy),   // 6: Bottom Back Right
+      project3D(-hw, y + hh, hd, yaw, pitch, cx, cy)   // 7: Bottom Back Left
     ];
 
     ctx.save();
     if (isSelected) {
-      ctx.shadowColor = glowColor;
-      ctx.shadowBlur = 18;
+      ctx.shadowColor = '#38bdf8';
+      ctx.shadowBlur = 15;
     }
 
-    faces.forEach((face) => {
+    const drawPoly = (indices: number[], fill: string, stroke: string) => {
       ctx.beginPath();
-      ctx.moveTo(vertices[face.indices[0]].x, vertices[face.indices[0]].y);
-      for (let i = 1; i < face.indices.length; i++) {
-        ctx.lineTo(vertices[face.indices[i]].x, vertices[face.indices[i]].y);
-      }
+      ctx.moveTo(v[indices[0]].x, v[indices[0]].y);
+      for (let i = 1; i < indices.length; i++) ctx.lineTo(v[indices[i]].x, v[indices[i]].y);
       ctx.closePath();
+      ctx.fillStyle = isXRay ? 'rgba(56, 189, 248, 0.15)' : fill;
+      ctx.strokeStyle = isSelected ? '#38bdf8' : stroke;
+      ctx.lineWidth = isSelected ? 2 : 1;
+      ctx.fill();
+      ctx.stroke();
+    };
 
-      if (isXRay) {
-        ctx.fillStyle = isSelected ? 'rgba(56, 189, 248, 0.25)' : 'rgba(71, 85, 105, 0.15)';
-        ctx.strokeStyle = isSelected ? glowColor : '#475569';
-        ctx.lineWidth = 1.5;
-        ctx.fill();
-        ctx.stroke();
-      } else {
-        ctx.fillStyle = fillColor;
-        ctx.strokeStyle = isSelected ? glowColor : '#1e293b';
-        ctx.lineWidth = isSelected ? 2 : 1;
-        ctx.fill();
-        ctx.stroke();
-      }
-    });
+    // Draw Top Face
+    drawPoly([0, 1, 2, 3], topColor, '#475569');
+    // Draw Front Face
+    drawPoly([0, 1, 5, 4], frontColor, '#334155');
+    // Draw Right Face
+    drawPoly([1, 2, 6, 5], sideColor, '#1e293b');
 
     ctx.restore();
   };
 
-  // Draw 18 Head Bolts
-  const draw18HeadBolts = (
+  // 1. Realistic Engine Block with 4 Cylinder Bores & Pistons
+  const drawRealisticEngineBlock = (
     ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    isXRay: boolean,
+    tick: number
+  ) => {
+    // Main Crankcase Block
+    renderBeveledBlock(ctx, cx, cy, y, 190, 48, 120, '#1e293b', '#0f172a', '#0a0f1d', isSelected, isXRay, yaw, pitch);
+
+    // 4 Cylinder Bores (92mm Diameter)
+    ctx.save();
+    for (let cyl = 0; cyl < 4; cyl++) {
+      const bx = -60 + cyl * 40;
+      const boreCenter = project3D(bx, y - 24, 0, yaw, pitch, cx, cy);
+
+      // Bore Top Rim
+      ctx.beginPath();
+      ctx.arc(boreCenter.x, boreCenter.y, 11, 0, Math.PI * 2);
+      ctx.fillStyle = '#020617';
+      ctx.fill();
+      ctx.strokeStyle = isSelected ? '#38bdf8' : '#475569';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Piston Crown inside bore (Piston moves rhythmically)
+      const pistonOffset = Math.sin(tick * 0.08 + (cyl % 2 === 0 ? 0 : Math.PI)) * 4;
+      const pistonP = project3D(bx, y - 24 + pistonOffset, 0, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.arc(pistonP.x, pistonP.y, 9, 0, Math.PI * 2);
+      ctx.fillStyle = '#64748b';
+      ctx.fill();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.stroke();
+    }
+    ctx.restore();
+  };
+
+  // 2. Realistic MLS Head Gasket with Fire Rings
+  const drawRealisticHeadGasket = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    isXRay: boolean
+  ) => {
+    renderBeveledBlock(ctx, cx, cy, y, 186, 4, 116, '#b45309', '#78350f', '#451a03', isSelected, isXRay, yaw, pitch);
+
+    // 4 Metallic Fire Rings
+    ctx.save();
+    for (let i = 0; i < 4; i++) {
+      const ringP = project3D(-60 + i * 40, y - 2, 0, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.arc(ringP.x, ringP.y, 12, 0, Math.PI * 2);
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+    // Gasket Notch Grade Identifier (Grade D: 2 Notches)
+    const notchP = project3D(85, y - 2, 50, yaw, pitch, cx, cy);
+    ctx.fillStyle = '#fbbf24';
+    ctx.beginPath();
+    ctx.arc(notchP.x, notchP.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  };
+
+  // 3. Realistic Cylinder Head & Pre-Combustion Swirl Cups
+  const drawRealisticCylinderHead = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    isXRay: boolean,
+    _flowMode: string,
+    tick: number
+  ) => {
+    renderBeveledBlock(ctx, cx, cy, y, 188, 38, 118, '#334155', '#1e293b', '#0f172a', isSelected, isXRay, yaw, pitch);
+
+    // 4 Ceramic Swirl Pre-Chamber Cups with Glow Plugs
+    ctx.save();
+    for (let i = 0; i < 4; i++) {
+      const cupP = project3D(-60 + i * 40, y + 10, -25, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.arc(cupP.x, cupP.y, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#1e293b';
+      ctx.fill();
+      ctx.strokeStyle = '#f87171';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Glowing Glow Plug Tip inside Pre-Chamber
+      const glowP = project3D(-60 + i * 40, y + 10, -22, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.arc(glowP.x, glowP.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(248, 113, 113, ${0.7 + Math.sin(tick * 0.1 + i) * 0.3})`;
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 8;
+      ctx.fill();
+    }
+    ctx.restore();
+  };
+
+  // 4. Realistic 8x Bucket Followers & Shims
+  const drawRealisticLiftersShims = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    _isXRay: boolean
+  ) => {
+    ctx.save();
+    // 8 Valves (Intake and Exhaust per cylinder)
+    for (let cyl = 0; cyl < 4; cyl++) {
+      for (let v = 0; v < 2; v++) {
+        const lx = -68 + cyl * 40 + v * 16;
+        const lz = v === 0 ? -18 : 18;
+        const lifterTop = project3D(lx, y - 8, lz, yaw, pitch, cx, cy);
+        const lifterBottom = project3D(lx, y + 8, lz, yaw, pitch, cx, cy);
+
+        // Lifter Cylinder Body
+        ctx.beginPath();
+        ctx.moveTo(lifterTop.x - 5, lifterTop.y);
+        ctx.lineTo(lifterTop.x + 5, lifterTop.y);
+        ctx.lineTo(lifterBottom.x + 5, lifterBottom.y);
+        ctx.lineTo(lifterBottom.x - 5, lifterBottom.y);
+        ctx.closePath();
+        ctx.fillStyle = isSelected ? '#a855f7' : '#64748b';
+        ctx.fill();
+        ctx.strokeStyle = isSelected ? '#c084fc' : '#94a3b8';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Stamped Ground Shim on Top
+        ctx.beginPath();
+        ctx.arc(lifterTop.x, lifterTop.y, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fill();
+        ctx.strokeStyle = '#c084fc';
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  };
+
+  // 5. Realistic SOHC Camshaft with 8 Egg-Shaped Lobes & Front Pulley
+  const drawRealisticCamshaft = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    _isXRay: boolean,
+    tick: number
+  ) => {
+    ctx.save();
+    // Camshaft Center Bar
+    const camLeft = project3D(-95, y, 0, yaw, pitch, cx, cy);
+    const camRight = project3D(85, y, 0, yaw, pitch, cx, cy);
+
+    ctx.beginPath();
+    ctx.moveTo(camLeft.x, camLeft.y);
+    ctx.lineTo(camRight.x, camRight.y);
+    ctx.strokeStyle = '#94a3b8';
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // 8 Eccentric Cam Lobes
+    for (let cyl = 0; cyl < 4; cyl++) {
+      for (let v = 0; v < 2; v++) {
+        const lx = -68 + cyl * 40 + v * 16;
+        const lobeCenter = project3D(lx, y, 0, yaw, pitch, cx, cy);
+
+        // Angled Egg-Shaped Cam Lobe
+        const lobeAngle = (cyl * 90 + v * 45 + tick * 2) * (Math.PI / 180);
+        const lobeTip = project3D(lx, y + Math.sin(lobeAngle) * 9, Math.cos(lobeAngle) * 9, yaw, pitch, cx, cy);
+
+        ctx.beginPath();
+        ctx.moveTo(lobeCenter.x, lobeCenter.y);
+        ctx.lineTo(lobeTip.x, lobeTip.y);
+        ctx.strokeStyle = isSelected ? '#38bdf8' : '#cbd5e1';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+    }
+
+    // Front Timing Sprocket Wheel (Left side)
+    const sprocketP = project3D(-98, y, 0, yaw, pitch, cx, cy);
+    ctx.beginPath();
+    ctx.arc(sprocketP.x, sprocketP.y, 22, 0, Math.PI * 2);
+    ctx.fillStyle = '#1e293b';
+    ctx.fill();
+    ctx.strokeStyle = isSelected ? '#38bdf8' : '#64748b';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // 3:00 Alignment Timing Notch
+    const notchP = project3D(-98, y, 22, yaw, pitch, cx, cy);
+    ctx.beginPath();
+    ctx.arc(notchP.x, notchP.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = '#ef4444';
+    ctx.fill();
+
+    ctx.restore();
+  };
+
+  // 6. Realistic Valve Cover with Contours & PCV Port
+  const drawRealisticValveCover = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    y: number,
+    yaw: number,
+    pitch: number,
+    isSelected: boolean,
+    isXRay: boolean
+  ) => {
+    // Ribbed Aluminum Cover
+    renderBeveledBlock(ctx, cx, cy, y, 184, 26, 114, '#475569', '#334155', '#1e293b', isSelected, isXRay, yaw, pitch);
+
+    // Top Cast Longitudinal Ribs
+    ctx.save();
+    ctx.strokeStyle = isSelected ? '#38bdf8' : '#64748b';
+    ctx.lineWidth = 2;
+    for (let r = -25; r <= 25; r += 12) {
+      const p1 = project3D(-70, y - 14, r, yaw, pitch, cx, cy);
+      const p2 = project3D(70, y - 14, r, yaw, pitch, cx, cy);
+      ctx.beginPath();
+      ctx.moveTo(p1.x, p1.y);
+      ctx.lineTo(p2.x, p2.y);
+      ctx.stroke();
+    }
+
+    // Oil Filler Cap on Front
+    const capP = project3D(-50, y - 15, -30, yaw, pitch, cx, cy);
+    ctx.beginPath();
+    ctx.arc(capP.x, capP.y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#0f172a';
+    ctx.fill();
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.restore();
+  };
+
+  // 7. 18 Cylinder Head Bolts (Hex heads and threaded shanks)
+  const drawRealisticHeadBolts = (
+    ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
+    headY: number,
     explosion: number,
     stage: number,
     yaw: number,
-    pitch: number,
-    cx: number,
-    cy: number
+    pitch: number
   ) => {
-    const headY = -20 * (explosion / 35);
-    const boltY = headY - 45 - explosion * 0.4;
+    const boltTopY = headY - 45 - explosion * 0.45;
+    const boltColor = stage === 3 ? '#ef4444' : stage === 2 ? '#f59e0b' : '#38bdf8';
 
     ctx.save();
-    // 18-bolt grid (2 rows of 9 bolts)
     for (let r = 0; r < 2; r++) {
       for (let c = 0; c < 9; c++) {
-        const bx = -70 + c * 17.5;
-        const bz = -40 + r * 80;
+        const bx = -72 + c * 18;
+        const bz = -42 + r * 84;
 
-        const pTop = project3D(bx, boltY, bz, yaw, pitch, cx, cy);
-        const pBottom = project3D(bx, headY + 10, bz, yaw, pitch, cx, cy);
+        const pTop = project3D(bx, boltTopY, bz, yaw, pitch, cx, cy);
+        const pBottom = project3D(bx, headY + 12, bz, yaw, pitch, cx, cy);
 
-        ctx.strokeStyle = stage === 3 ? '#ef4444' : stage === 2 ? '#f59e0b' : '#38bdf8';
-        ctx.lineWidth = 2.5;
+        // Bolt Shank with High-Tensile Metallic Gradient
         ctx.beginPath();
         ctx.moveTo(pTop.x, pTop.y);
         ctx.lineTo(pBottom.x, pBottom.y);
+        ctx.strokeStyle = boltColor;
+        ctx.lineWidth = 2.5;
         ctx.stroke();
 
-        // Bolt Head Hex Cap
-        ctx.fillStyle = '#ffffff';
+        // 12-Point 14mm Flanged Bolt Head
         ctx.beginPath();
-        ctx.arc(pTop.x, pTop.y, 3.5, 0, Math.PI * 2);
+        ctx.arc(pTop.x, pTop.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
         ctx.fill();
+        ctx.strokeStyle = boltColor;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
       }
     }
     ctx.restore();
   };
 
-  // Draw Fluid Flow Particles
-  const drawFluidFlowParticles = (
+  // 8. Streamlined Fluid Flow Ribbons & Vectors
+  const drawFluidFlowStream = (
     ctx: CanvasRenderingContext2D,
+    cx: number,
+    cy: number,
     mode: 'coolant' | 'oil' | 'fuel',
-    tick: number,
-    baseY: number,
+    explosion: number,
     yaw: number,
     pitch: number,
-    cx: number,
-    cy: number
+    tick: number
   ) => {
     ctx.save();
-    const particleCount = 18;
-    const color = mode === 'coolant' ? '#38bdf8' : mode === 'oil' ? '#fbbf24' : '#10b981';
-    ctx.fillStyle = color;
+    const color = mode === 'coolant' ? '#38bdf8' : mode === 'oil' ? '#fbbf24' : '#34d399';
+    const baseY = (mode === 'coolant' ? -15 : mode === 'oil' ? 75 : -15) * explosion;
+
+    // Draw Continuous Fluid Pipeline
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 4;
+    ctx.lineCap = 'round';
     ctx.shadowColor = color;
-    ctx.shadowBlur = 10;
+    ctx.shadowBlur = 12;
 
-    for (let i = 0; i < particleCount; i++) {
-      const progress = ((tick * 1.5 + i * 20) % 300) - 150;
-      const px = progress;
-      const py = baseY + Math.sin(tick * 0.05 + i) * 6;
-      const pz = Math.cos(tick * 0.05 + i) * 35;
-
-      const p = project3D(px, py, pz, yaw, pitch, cx, cy);
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-      ctx.fill();
+    ctx.beginPath();
+    for (let i = -80; i <= 80; i += 10) {
+      const py = baseY + Math.sin(tick * 0.06 + i * 0.05) * 6;
+      const pz = Math.cos(tick * 0.06 + i * 0.05) * 35;
+      const p = project3D(i, py, pz, yaw, pitch, cx, cy);
+      if (i === -80) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
     }
+    ctx.stroke();
+
+    // Pulse Waveform Head
+    const pulseHeadX = ((tick * 2) % 160) - 80;
+    const pulseHeadY = baseY + Math.sin(tick * 0.06 + pulseHeadX * 0.05) * 6;
+    const pulseHeadZ = Math.cos(tick * 0.06 + pulseHeadX * 0.05) * 35;
+    const pulseP = project3D(pulseHeadX, pulseHeadY, pulseHeadZ, yaw, pitch, cx, cy);
+
+    ctx.beginPath();
+    ctx.arc(pulseP.x, pulseP.y, 6, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+
     ctx.restore();
   };
 
@@ -381,9 +733,9 @@ export const Engine3DVisualizer: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <span className="badge-toyota">WebGL 3D Digital Twin</span>
+              <span className="badge-toyota">Automotive CAD 3D Digital Twin</span>
               <span className="badge-spec flex items-center gap-1">
-                <Sparkles className="w-3 h-3 text-cyan-400" /> Real-Time Exploded Assembly Engine
+                <Sparkles className="w-3 h-3 text-cyan-400" /> Real-Time Engine Assembly & Fluid Dynamics
               </span>
             </div>
             <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
@@ -391,11 +743,11 @@ export const Engine3DVisualizer: React.FC = () => {
               2L-T Interactive 3D Digital Twin & Exploded Assembly
             </h2>
             <p className="text-sm text-gray-400 mt-1 max-w-3xl leading-relaxed">
-              Explore the Toyota 2L-T cylinder head, valvetrain, camshaft, MLS gasket, and engine block in real-time isometric 3D space with fluid flow pathways and 18-bolt torque sequence visualization.
+              Precision 3D rendering of the 2L-T valvetrain, camshaft, swirl pre-chambers, MLS gasket, and deep-skirt block with interactive fluid dynamics and 18-bolt torque sequence visualization.
             </p>
           </div>
 
-          {/* Quick View Controls */}
+          {/* View Controls */}
           <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => setXRayMode(!xRayMode)}
@@ -424,13 +776,13 @@ export const Engine3DVisualizer: React.FC = () => {
       {/* Main 3D Canvas & Interactive Workspace */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* 3D Viewport Canvas (2 Columns) */}
-        <div className="lg:col-span-2 tech-panel bg-[#0a0d11] border-[#222b37] overflow-hidden flex flex-col relative min-h-[460px]">
+        <div className="lg:col-span-2 tech-panel bg-[#0a0d11] border-[#222b37] overflow-hidden flex flex-col relative min-h-[480px]">
           {/* Canvas Viewport */}
           <canvas
             ref={canvasRef}
             width={720}
-            height={460}
-            className="w-full h-[460px] cursor-grab active:cursor-grabbing"
+            height={480}
+            className="w-full h-[480px] cursor-grab active:cursor-grabbing"
             onMouseDown={(e) => {
               const startX = e.clientX;
               const startY = e.clientY;
@@ -463,36 +815,36 @@ export const Engine3DVisualizer: React.FC = () => {
 
           {/* Fluid Flow Selector Toolbar */}
           <div className="absolute top-4 right-4 flex items-center gap-1.5 bg-[#12161cf0] backdrop-blur-md p-1.5 rounded-xl border border-[#242e3c]">
-            <span className="text-[10px] font-mono text-gray-400 px-1">Flows:</span>
+            <span className="text-[10px] font-mono text-gray-400 px-1">Fluid Flow:</span>
             <button
               onClick={() => setFluidFlowMode(fluidFlowMode === 'coolant' ? 'none' : 'coolant')}
-              className={`px-2 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all flex items-center gap-1 ${
                 fluidFlowMode === 'coolant'
                   ? 'bg-sky-600 text-white shadow-md'
                   : 'text-gray-400 hover:text-white bg-[#19202a]'
               }`}
             >
-              Coolant
+              <Droplet className="w-3 h-3 text-sky-300" /> Coolant Loop
             </button>
             <button
               onClick={() => setFluidFlowMode(fluidFlowMode === 'oil' ? 'none' : 'oil')}
-              className={`px-2 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all flex items-center gap-1 ${
                 fluidFlowMode === 'oil'
                   ? 'bg-amber-600 text-white shadow-md'
                   : 'text-gray-400 hover:text-white bg-[#19202a]'
               }`}
             >
-              Oil
+              <Flame className="w-3 h-3 text-amber-300" /> Oil Galleys
             </button>
             <button
               onClick={() => setFluidFlowMode(fluidFlowMode === 'fuel' ? 'none' : 'fuel')}
-              className={`px-2 py-1 rounded text-[10px] font-mono font-bold transition-all ${
+              className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all flex items-center gap-1 ${
                 fluidFlowMode === 'fuel'
                   ? 'bg-emerald-600 text-white shadow-md'
                   : 'text-gray-400 hover:text-white bg-[#19202a]'
               }`}
             >
-              Fuel
+              <Zap className="w-3 h-3 text-emerald-300" /> Fuel Circuit
             </button>
           </div>
 
@@ -554,7 +906,7 @@ export const Engine3DVisualizer: React.FC = () => {
                   <div className="flex items-center gap-2">
                     <span
                       className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: layer.glowColor }}
+                      style={{ backgroundColor: layer.accentColor }}
                     />
                     <span className="font-bold text-gray-200 line-clamp-1">{layer.name}</span>
                   </div>
