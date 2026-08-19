@@ -73,11 +73,11 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
   },
   {
     id: 'diagnostics',
-    label: 'Diagnostics & Acoustic Sound Lab',
-    shortLabel: 'Audio Diagnostics',
+    label: 'Diagnostics & Workshop Procedures',
+    shortLabel: 'Diagnostics',
     icon: Stethoscope,
-    badge: 'Audio FFT',
-    description: 'Live microphone sound analyzer, 7-tree wizard & 12 workshop guides.'
+    badge: '7 Trees & Guides',
+    description: 'Interactive 7-tree diagnostic decision wizard & 12 factory workshop procedures.'
   },
   {
     id: 'trail',
