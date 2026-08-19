@@ -17,7 +17,8 @@ import {
   Layers,
   Menu,
   X,
-  MapPin
+  MapPin,
+  Fuel
 } from 'lucide-react';
 
 import { VehicleOverview } from './components/VehicleOverview';
@@ -34,9 +35,11 @@ import { VacuumWiringTracer } from './components/VacuumWiringTracer';
 import { FluidsMaintenance } from './components/FluidsMaintenance';
 import { QuickSearchModal } from './components/QuickSearchModal';
 import { ElectricalConnectorLocator } from './components/ElectricalConnectorLocator';
+import { FuelSystemHub } from './components/FuelSystemHub';
 
 type TabId =
   | 'overview'
+  | 'fuel-system'
   | 'head-torque'
   | 'valve-shim'
   | 'timing-belt'
@@ -55,13 +58,14 @@ interface NavItem {
   label: string;
   shortLabel: string;
   icon: React.ComponentType<{ className?: string }>;
-  category: 'Engine' | 'Electrical' | 'Chassis & 4WD' | 'Diagnostics' | 'Reference';
+  category: 'Engine' | 'Fuel & Turbo' | 'Electrical' | 'Chassis & 4WD' | 'Diagnostics' | 'Reference';
   badge?: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: '1991 4Runner Specs & Decoder', shortLabel: 'Overview', icon: Truck, category: 'Reference' },
-  { id: 'connector-locator', label: 'Electronics & Connector Locator', shortLabel: 'Part Locator', icon: MapPin, category: 'Electrical', badge: 'Map & Pinouts' },
+  { id: 'fuel-system', label: 'Mechanical Fuel Circuit & Suction Lines', shortLabel: 'Fuel Circuit', icon: Fuel, category: 'Fuel & Turbo', badge: 'Suction Lab' },
+  { id: 'connector-locator', label: 'Electronics & Connector Locator', shortLabel: 'Part Locator', icon: MapPin, category: 'Electrical', badge: 'Photos' },
   { id: 'head-torque', label: '18-Bolt Head Torque Sequencer', shortLabel: 'Head Torque', icon: Wrench, category: 'Engine', badge: 'Interactive' },
   { id: 'valve-shim', label: 'Valve Lash Shim Calculator', shortLabel: 'Valve Shims', icon: Layers, category: 'Engine', badge: 'Calculator' },
   { id: 'timing-belt', label: 'Timing Belt & Gear Alignment', shortLabel: 'Timing Belt', icon: RotateCw, category: 'Engine' },
@@ -70,7 +74,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: 'vacuum-wiring', label: 'Vacuum Lines & Wiring Tracer', shortLabel: 'Vacuum / Wire', icon: GitBranch, category: 'Electrical' },
   { id: 'drivetrain', label: '4WD Drivetrain & 8-Zerk Lube', shortLabel: '4WD Drivetrain', icon: Compass, category: 'Chassis & 4WD' },
   { id: 'diagnostics', label: 'Interactive Diagnostic Wizard', shortLabel: 'Diagnostics', icon: Stethoscope, category: 'Diagnostics', badge: 'Wizard' },
-  { id: 'procedures', label: 'Step-by-Step Workshop Runner', shortLabel: 'Procedures', icon: BookOpen, category: 'Reference', badge: 'Checklists' },
+  { id: 'procedures', label: 'Step-by-Step Workshop Runner', shortLabel: 'Procedures', icon: BookOpen, category: 'Reference', badge: '12 Guides' },
   { id: 'torque-finder', label: 'Master Fastener & Torque Finder', shortLabel: 'Torque DB', icon: Gauge, category: 'Reference' },
   { id: 'fluids', label: 'Fluids & Maintenance Schedule', shortLabel: 'Fluids / Svc', icon: Droplet, category: 'Reference' },
 ];
@@ -165,9 +169,9 @@ export function App() {
         {/* Quick Ticker Sub-Header */}
         <div className="bg-[#101317] border-t border-[#1e232b] px-4 py-1.5 text-[11px] font-mono text-gray-400 overflow-x-auto flex items-center justify-between gap-6 max-w-7xl mx-auto">
           <div className="flex items-center gap-4 flex-shrink-0">
+            <span><strong className="text-gray-300">Fuel System:</strong> 100% Mechanical Suction (No in-tank pump)</span>
             <span><strong className="text-gray-300">Head Torque:</strong> 78 Nm + 90° + 90°</span>
             <span><strong className="text-gray-300">Valve Lash (Cold):</strong> In 0.25mm / Ex 0.45mm</span>
-            <span><strong className="text-gray-300">Oil Capacity:</strong> 6.7 L (15W-40 CF-4)</span>
             <span><strong className="text-gray-300">Max Safe EGT:</strong> &lt; 650°C</span>
           </div>
           <div className="flex items-center gap-2 text-emerald-400 flex-shrink-0">
@@ -228,8 +232,8 @@ export function App() {
 
             {/* Quick Helper Alert in Sidebar */}
             <div className="mt-4 p-3 rounded-lg bg-[#181d24] border border-[#27303c] text-[11px] text-gray-400 leading-relaxed font-sans">
-              <strong className="text-cyan-400 font-mono block mb-1">PART LOCATOR:</strong>
-              Can't find a sensor or relay? Click <strong className="text-white">Part Locator</strong> to view exact vehicle positions, wire color stripes, and test voltages.
+              <strong className="text-amber-400 font-mono block mb-1">MECHANICAL DIESEL:</strong>
+              The 2L-T fuel line is under <strong className="text-white">suction vacuum</strong>. Check the <strong className="text-amber-300">Fuel Circuit Hub</strong> to debug air bubbles, primer leaks, and tank sock restrictions.
             </div>
           </div>
         </aside>
@@ -237,6 +241,7 @@ export function App() {
         {/* Center Main Dynamic Content View */}
         <main className="flex-1 min-w-0">
           {activeTab === 'overview' && <VehicleOverview />}
+          {activeTab === 'fuel-system' && <FuelSystemHub />}
           {activeTab === 'connector-locator' && <ElectricalConnectorLocator />}
           {activeTab === 'head-torque' && <HeadTorqueSimulator />}
           {activeTab === 'valve-shim' && <ValveShimCalculator />}
