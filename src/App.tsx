@@ -4,8 +4,9 @@ import {
   Wrench,
   Fuel,
   Zap,
-  Stethoscope,
   Compass,
+  Stethoscope,
+  ShieldAlert,
   Search,
   Moon,
   Sun,
@@ -17,6 +18,7 @@ import { OverviewFsmHub } from './components/hubs/OverviewFsmHub';
 import { EngineHub } from './components/hubs/EngineHub';
 import { FuelSystemHub } from './components/FuelSystemHub';
 import { ElectricalHub } from './components/hubs/ElectricalHub';
+import { DrivetrainMasterHub } from './components/hubs/DrivetrainMasterHub';
 import { DiagnosticsHub } from './components/hubs/DiagnosticsHub';
 import { TrailOverlandingHub } from './components/hubs/TrailOverlandingHub';
 import { QuickSearchModal } from './components/QuickSearchModal';
@@ -26,6 +28,7 @@ type HubId =
   | 'engine'
   | 'fuel'
   | 'electrical'
+  | 'drivetrain'
   | 'diagnostics'
   | 'trail';
 
@@ -44,12 +47,12 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
     label: 'Overview & Master FSM Manual',
     shortLabel: 'Overview & FSM',
     icon: Truck,
-    badge: 'Ch 1-5 Blueprint',
+    badge: 'Ch 1-5 Specs',
     description: 'Vehicle specs, VIN decoder, machine shop tolerances & torque database.'
   },
   {
     id: 'engine',
-    label: 'Engine & Powertrain Hub',
+    label: 'Engine & Valvetrain Hub',
     shortLabel: 'Engine & Head',
     icon: Wrench,
     badge: '18-Bolt & Lash',
@@ -72,6 +75,14 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
     description: 'Photo connector locator, live ignition/relay sandbox & Super Glow II.'
   },
   {
+    id: 'drivetrain',
+    label: '4WD Drivetrain, Transfer & Axles',
+    shortLabel: '4WD Drivetrain',
+    icon: Compass,
+    badge: 'Gearing & Lube',
+    description: 'Gearing & tire physics, 4-Low crawl ratios, transfer case & 8-zerk lube.'
+  },
+  {
     id: 'diagnostics',
     label: 'Diagnostics & Workshop Procedures',
     shortLabel: 'Diagnostics',
@@ -81,11 +92,11 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
   },
   {
     id: 'trail',
-    label: 'Trail Rescue & Overlanding Hub',
+    label: 'Trail Rescue & Service Logbook',
     shortLabel: 'Trail Rescue',
-    icon: Compass,
+    icon: ShieldAlert,
     badge: 'Glovebox Log',
-    description: 'Drivetrain & tire physics, emergency field hacks & shim logbook.'
+    description: 'Field emergency bypass protocols & vehicle maintenance timeline.'
   }
 ];
 
@@ -117,10 +128,12 @@ export function App() {
       setActiveHub('fuel');
     } else if (tabId === 'connector-locator' || tabId === 'super-glow' || tabId === 'vacuum-wiring') {
       setActiveHub('electrical');
+    } else if (tabId === 'drivetrain' || tabId === 'gearing') {
+      setActiveHub('drivetrain');
     } else if (tabId === 'diagnostics' || tabId === 'procedures') {
       setActiveHub('diagnostics');
       if (itemRef) setTargetProcedureId(itemRef);
-    } else if (tabId === 'drivetrain') {
+    } else if (tabId === 'trail-rescue' || tabId === 'logbook') {
       setActiveHub('trail');
     } else {
       setActiveHub(tabId as HubId);
@@ -191,7 +204,7 @@ export function App() {
         {/* Quick Ticker Sub-Header */}
         <div className="bg-[#101317] border-t border-[#1e232b] px-4 py-1.5 text-[11px] font-mono text-gray-400 overflow-x-auto flex items-center justify-between gap-6 max-w-7xl mx-auto">
           <div className="flex items-center gap-4 flex-shrink-0">
-            <span><strong className="text-gray-300">Architecture:</strong> 6 Master Hubs</span>
+            <span><strong className="text-gray-300">Hubs:</strong> 7 Dedicated Workspaces</span>
             <span><strong className="text-gray-300">Fuel System:</strong> 100% Mechanical Suction (No in-tank pump)</span>
             <span><strong className="text-gray-300">Head Torque:</strong> 78 Nm + 90° + 90°</span>
             <span><strong className="text-gray-300">Max Safe EGT:</strong> &lt; 650°C</span>
@@ -206,7 +219,7 @@ export function App() {
       {/* Main App Body with Sidebar & Content Area */}
       <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col lg:flex-row gap-6">
         
-        {/* Left Desktop Sidebar Navigation (6 Master Hubs) */}
+        {/* Left Desktop Sidebar Navigation (7 Master Hubs) */}
         <aside
           className={`lg:w-64 flex-shrink-0 space-y-1 ${
             mobileMenuOpen ? 'block' : 'hidden lg:block'
@@ -214,7 +227,7 @@ export function App() {
         >
           <div className="tech-panel p-3 bg-[#13161a] sticky top-28 space-y-1">
             <span className="text-[10px] font-mono uppercase font-bold text-gray-500 px-3 py-1 block">
-              6 Master Workshop Hubs
+              7 Dedicated Master Hubs
             </span>
 
             {HUB_NAV_ITEMS.map((hub) => {
@@ -259,8 +272,8 @@ export function App() {
 
             {/* Helper callout */}
             <div className="mt-4 p-3 rounded-lg bg-[#181d24] border border-[#27303c] text-[11px] text-gray-400 leading-relaxed font-sans">
-              <strong className="text-cyan-400 font-mono block mb-1">UNCLUTTERED HUBS:</strong>
-              Every hub features dedicated sub-tabs for deep tools, 3D simulations, audio spectrum analysis, and workshop procedures.
+              <strong className="text-cyan-400 font-mono block mb-1">DEDICATED HUBS:</strong>
+              Every major vehicle system has its own clean hub with deep sub-tools, interactive calculators, and factory FSM specifications.
             </div>
           </div>
         </aside>
@@ -271,6 +284,7 @@ export function App() {
           {activeHub === 'engine' && <EngineHub />}
           {activeHub === 'fuel' && <FuelSystemHub />}
           {activeHub === 'electrical' && <ElectricalHub />}
+          {activeHub === 'drivetrain' && <DrivetrainMasterHub />}
           {activeHub === 'diagnostics' && (
             <DiagnosticsHub initialProcedureId={targetProcedureId} />
           )}
