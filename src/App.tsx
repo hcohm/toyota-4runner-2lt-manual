@@ -50,10 +50,10 @@ const HUB_NAV_ITEMS: HubNavItem[] = [
   {
     id: 'engine',
     label: 'Engine & Powertrain Hub',
-    shortLabel: 'Engine & 3D',
+    shortLabel: 'Engine & Head',
     icon: Wrench,
-    badge: '3D Digital Twin',
-    description: 'Interactive 3D exploded engine, 18-bolt torque sequencer & valve lash.'
+    badge: '18-Bolt & Lash',
+    description: '18-bolt torque sequencer, valve lash calculator & timing belt alignment.'
   },
   {
     id: 'fuel',
