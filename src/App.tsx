@@ -18,7 +18,8 @@ import {
   Menu,
   X,
   MapPin,
-  Fuel
+  Fuel,
+  FileText
 } from 'lucide-react';
 
 import { VehicleOverview } from './components/VehicleOverview';
@@ -36,9 +37,11 @@ import { FluidsMaintenance } from './components/FluidsMaintenance';
 import { QuickSearchModal } from './components/QuickSearchModal';
 import { ElectricalConnectorLocator } from './components/ElectricalConnectorLocator';
 import { FuelSystemHub } from './components/FuelSystemHub';
+import { MasterManualHub } from './components/MasterManualHub';
 
 type TabId =
   | 'overview'
+  | 'master-manual'
   | 'fuel-system'
   | 'head-torque'
   | 'valve-shim'
@@ -64,6 +67,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: '1991 4Runner Specs & Decoder', shortLabel: 'Overview', icon: Truck, category: 'Reference' },
+  { id: 'master-manual', label: 'Master FSM & Haynes Overhaul Manual', shortLabel: 'Master FSM', icon: FileText, category: 'Reference', badge: 'Chapters 1-5' },
   { id: 'fuel-system', label: 'Mechanical Fuel Circuit & Suction Lines', shortLabel: 'Fuel Circuit', icon: Fuel, category: 'Fuel & Turbo', badge: 'Suction Lab' },
   { id: 'connector-locator', label: 'Electronics & Connector Locator', shortLabel: 'Part Locator', icon: MapPin, category: 'Electrical', badge: 'Photos' },
   { id: 'head-torque', label: '18-Bolt Head Torque Sequencer', shortLabel: 'Head Torque', icon: Wrench, category: 'Engine', badge: 'Interactive' },
@@ -232,8 +236,8 @@ export function App() {
 
             {/* Quick Helper Alert in Sidebar */}
             <div className="mt-4 p-3 rounded-lg bg-[#181d24] border border-[#27303c] text-[11px] text-gray-400 leading-relaxed font-sans">
-              <strong className="text-amber-400 font-mono block mb-1">MECHANICAL DIESEL:</strong>
-              The 2L-T fuel line is under <strong className="text-white">suction vacuum</strong>. Check the <strong className="text-amber-300">Fuel Circuit Hub</strong> to debug air bubbles, primer leaks, and tank sock restrictions.
+              <strong className="text-amber-400 font-mono block mb-1">HAYNES DEPTH:</strong>
+              Check the <strong className="text-white">Master FSM Manual</strong> for complete machine-shop wear limits, Plastigage clearances, and rebuild tolerances.
             </div>
           </div>
         </aside>
@@ -241,6 +245,7 @@ export function App() {
         {/* Center Main Dynamic Content View */}
         <main className="flex-1 min-w-0">
           {activeTab === 'overview' && <VehicleOverview />}
+          {activeTab === 'master-manual' && <MasterManualHub />}
           {activeTab === 'fuel-system' && <FuelSystemHub />}
           {activeTab === 'connector-locator' && <ElectricalConnectorLocator />}
           {activeTab === 'head-torque' && <HeadTorqueSimulator />}
