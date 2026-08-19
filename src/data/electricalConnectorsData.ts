@@ -15,6 +15,10 @@ export interface ElectricalComponentLocator {
   zone: "Engine Bay (Driver Side)" | "Engine Bay (Passenger Side)" | "Engine / Block Mounted" | "Cabin (Driver Footwell)" | "Drivetrain & Undercarriage";
   x: number; // Percentage on vehicle map
   y: number;
+  photoUrl: string;
+  photoTitle: string;
+  photoHotspotX: number; // percentage in the photo
+  photoHotspotY: number;
   physicalLocation: string;
   visualIdentifier: string;
   accessTips: string;
@@ -55,8 +59,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Glow Plug Timer ECU (Pre-Heating Computer)",
     shortCode: "GLOW-ECU",
     zone: "Cabin (Driver Footwell)",
-    x: 42,
-    y: 38,
+    x: 35,
+    y: 44,
+    photoUrl: "./reference/glow_timer_kick.jpg",
+    photoTitle: "Driver Footwell Lower A-Pillar (Behind Kick Panel)",
+    photoHotspotX: 52,
+    photoHotspotY: 53,
     physicalLocation: "Inside cabin, bolted to the outer body pillar behind the plastic driver's left kick panel, just above the hood release latch.",
     visualIdentifier: "Black plastic rectangular module (~10x7 cm) with an aluminum mounting bracket and a 10-pin yellow/white locking connector. Stamped 'COMPUTER, GLOW PLUG TIMER' (OEM: 28521-54280 / 28521-54370).",
     accessTips: "Pry off the driver's plastic door sill scuff plate, unscrew the plastic thumb nut on the kick panel, and pull kick panel inward. Unbolt two 10mm bolts holding the bracket.",
@@ -82,8 +90,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Glow Relay No. 1 (Main High-Current 12V Pre-Glow)",
     shortCode: "RELAY-1",
     zone: "Engine Bay (Driver Side)",
-    x: 24,
-    y: 28,
+    x: 26,
+    y: 25,
+    photoUrl: "./reference/glow_relays_fender.jpg",
+    photoTitle: "Driver Inner Fender Apron (Next to Fusible Link Box)",
+    photoHotspotX: 68,
+    photoHotspotY: 48,
     physicalLocation: "Mounted on the driver's side inner fender apron wall, approximately 15 cm behind the 80A main fusible link box.",
     visualIdentifier: "Heavy-duty cylindrical / square metal-can relay with two thick M6 threaded copper post studs for 12V battery cables and a 2-pin plastic trigger pigtail connector.",
     accessTips: "Easily accessible from the engine bay. Remove rubber weather cap over copper studs to probe 12V high-current bus.",
@@ -106,8 +118,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Glow Relay No. 2 (After-Glow Step-Down Relay)",
     shortCode: "RELAY-2",
     zone: "Engine Bay (Driver Side)",
-    x: 26,
-    y: 33,
+    x: 27,
+    y: 32,
+    photoUrl: "./reference/glow_relays_fender.jpg",
+    photoTitle: "Driver Inner Fender Apron (Right of Relay 1)",
+    photoHotspotX: 82,
+    photoHotspotY: 50,
     physicalLocation: "Mounted directly beside Glow Relay No. 1 on the driver's inner fender apron.",
     visualIdentifier: "Similar metal-can relay. Routes power through the dropping resistor on the intake manifold rather than directly to the bus bar.",
     accessTips: "Located 5 cm rearward of Relay No. 1 on the same metal bracket.",
@@ -125,12 +141,67 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     ]
   },
   {
+    id: "main-fuse-box-engine",
+    name: "Main Engine Bay Fusible Link & Relay Center",
+    shortCode: "FUSE-ENG",
+    zone: "Engine Bay (Driver Side)",
+    x: 23,
+    y: 18,
+    photoUrl: "./reference/glow_relays_fender.jpg",
+    photoTitle: "Main Fusible Link Box (Driver Fender Behind Battery)",
+    photoHotspotX: 46,
+    photoHotspotY: 48,
+    physicalLocation: "Black plastic fuse box mounted on the driver's side inner fender, situated directly behind the main starting battery.",
+    visualIdentifier: "Rectangular black plastic cover embossed with 'FUSE & RELAY'. Contains the 80A GLOW bolt-down fusible link, 60A MAIN, and 30A HEAD fuses.",
+    accessTips: "Depress plastic side clips to unlatch cover. 80A fusible link is bolted down with two 8mm screws from underneath the bus bar.",
+    system: "Charging & Power",
+    connectorShape: "Screw Terminal Stud",
+    pins: [
+      { pinNumber: 1, label: "80A GLOW", wireColor: "W", wireColorFull: "White 8.0mm²", function: "Main feed for Glow Relay 1 & Relay 2", testCondition: "Constant", expectedVoltage: "12.6 V DC" },
+      { pinNumber: 2, label: "60A MAIN", wireColor: "W-R", wireColorFull: "White / Red 5.0mm²", function: "Main battery power feed to cabin ignition switch", testCondition: "Constant", expectedVoltage: "12.6 V DC" },
+      { pinNumber: 3, label: "30A HEAD", wireColor: "R-Y", wireColorFull: "Red / Yellow 3.0mm²", function: "Headlight and lighting circuit feed", testCondition: "Constant", expectedVoltage: "12.6 V DC" }
+    ],
+    failureSymptoms: [
+      "Completely dead vehicle with zero power to ignition switch (60A MAIN blown)",
+      "Zero power to glow plugs (80A GLOW blown after accidental short circuit on bus bar)"
+    ]
+  },
+  {
+    id: "fuel-cut-solenoid",
+    name: "Bosch VE Fuel Cut Solenoid",
+    shortCode: "FUEL-CUT",
+    zone: "Engine / Block Mounted",
+    x: 48,
+    y: 33,
+    photoUrl: "./reference/ve_fuel_cut.jpg",
+    photoTitle: "Bosch VE Injection Pump Distributor Head (Rear View)",
+    photoHotspotX: 62,
+    photoHotspotY: 57,
+    physicalLocation: "Threaded vertically into the rear distributor cast iron head of the Bosch VE fuel injection pump, situated directly between the 4 high-pressure delivery valve fittings.",
+    visualIdentifier: "24mm brass/steel hexagonal solenoid body with a single terminal stud covered by a black rubber boot. Single wire connected with an 8mm nut.",
+    accessTips: "Located on the pump rear facing the firewall. Reach down between the intake manifold runners.",
+    system: "Fuel & Turbo",
+    connectorShape: "1-Pin Spade",
+    pins: [
+      { pinNumber: 1, label: "IGN 12V", wireColor: "B-W", wireColorFull: "Black / White", function: "12V power from ignition switch / IGN 15A fuse to retract internal fuel stop plunger", testCondition: "Key in ON / START", expectedVoltage: "12.0 – 12.6 V DC" }
+    ],
+    failureSymptoms: [
+      "Engine cranks strongly and has compression, but will not fire even with starter fluid",
+      "Zero fuel squirt from loosened injector flare nuts while cranking",
+      "Engine suddenly shuts off while driving if wire is loose"
+    ]
+  },
+  {
     id: "dropping-resistor",
     name: "Dropping Resistor (Glow Step-Down Resistor 0.02 Ω)",
     shortCode: "DROP-RES",
     zone: "Engine / Block Mounted",
-    x: 65,
-    y: 28,
+    x: 46,
+    y: 22,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Top of Aluminum Intake Manifold Plenum",
+    photoHotspotX: 36,
+    photoHotspotY: 38,
     physicalLocation: "Bolted directly to the top surface of the aluminum intake manifold crossover chamber (Right/top of engine).",
     visualIdentifier: "Rectangular ribbed ceramic/aluminum resistor body (~8x3 cm) with two 8mm nut screw terminals with protective rubber boots. Marked '0.02 Ω'.",
     accessTips: "Clearly visible on top of the intake manifold right above the glow plug bus bar.",
@@ -150,8 +221,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Water Temperature Sensor (for Glow Timer Thermistor)",
     shortCode: "THW-SENS",
     zone: "Engine / Block Mounted",
-    x: 58,
-    y: 20,
+    x: 48,
+    y: 17,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Water Outlet Thermostat Housing (Front Cylinder Head)",
+    photoHotspotX: 42,
+    photoHotspotY: 57,
     physicalLocation: "Threaded into the water outlet housing at the front top of the cylinder head, right next to the upper radiator hose connection.",
     visualIdentifier: "Brass hexagonal sensor with a GREEN 2-pin oval plastic waterproof connector with a wire spring locking clip (OEM: 89422-20010).",
     accessTips: "Front of engine head, behind the timing belt upper plastic cover.",
@@ -167,33 +242,16 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     ]
   },
   {
-    id: "fuel-cut-solenoid",
-    name: "Bosch VE Fuel Cut Solenoid",
-    shortCode: "FUEL-CUT",
-    zone: "Engine / Block Mounted",
-    x: 52,
-    y: 42,
-    physicalLocation: "Threaded vertically into the rear distributor cast iron head of the Bosch VE fuel injection pump, situated directly between the 4 high-pressure delivery valve fittings.",
-    visualIdentifier: "24mm brass/steel hexagonal solenoid body with a single terminal stud covered by a black rubber boot. Single wire connected with an 8mm nut.",
-    accessTips: "Located on the pump rear facing the firewall. Reach down between the intake manifold runners.",
-    system: "Fuel & Turbo",
-    connectorShape: "1-Pin Spade",
-    pins: [
-      { pinNumber: 1, label: "IGN 12V", wireColor: "B-W", wireColorFull: "Black / White", function: "12V power from ignition switch / IGN 15A fuse to retract internal fuel stop plunger", testCondition: "Key in ON / START", expectedVoltage: "12.0 – 12.6 V DC" }
-    ],
-    failureSymptoms: [
-      "Engine cranks strongly and has compression, but will not fire even with starter fluid",
-      "Zero fuel squirt from loosened injector flare nuts while cranking",
-      "Engine suddenly shuts off while driving if wire is loose"
-    ]
-  },
-  {
     id: "vsv-4wd-add",
     name: "4WD ADD Vacuum Switching Valves (Blue: 4WD / Brown: 2WD)",
     shortCode: "4WD-VSVs",
     zone: "Engine Bay (Passenger Side)",
-    x: 78,
-    y: 35,
+    x: 72,
+    y: 26,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Passenger Inner Fender (Near Fuel Filter / Brake Booster)",
+    photoHotspotX: 80,
+    photoHotspotY: 41,
     physicalLocation: "Mounted on a bracket on the passenger-side inner fender apron, located between the windshield washer fluid bottle and the fuel filter assembly.",
     visualIdentifier: "Two colored cylindrical solenoids mounted side-by-side: BLUE valve is for 4WD engagement, BROWN valve is for 2WD disengagement. Each has a 2-pin connector and two 3.5mm vacuum ports.",
     accessTips: "Passenger fender apron. Check the vacuum hoses running down beneath the battery tray.",
@@ -214,8 +272,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Alternator & Internal IC Regulator Connector",
     shortCode: "ALT-REG",
     zone: "Engine / Block Mounted",
-    x: 62,
-    y: 55,
+    x: 58,
+    y: 29,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Lower Right Engine Block (Beneath CT20 Turbo)",
+    photoHotspotX: 63,
+    photoHotspotY: 63,
     physicalLocation: "Located on the rear cover of the 55A/60A alternator on the lower right side of the engine block.",
     visualIdentifier: "Green or Grey 3-pin round/oval waterproof connector with locking tab, plus a separate heavy-gauge B+ output stud with a rubber boot.",
     accessTips: "Accessed from underneath passenger wheel well or through the front skid plate opening.",
@@ -237,8 +299,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Fuel Filter Water Sedimenter Float Switch",
     shortCode: "SED-SWITCH",
     zone: "Engine Bay (Passenger Side)",
-    x: 75,
-    y: 22,
+    x: 74,
+    y: 19,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Passenger Firewall / Inner Fender Fuel Filter",
+    photoHotspotX: 78,
+    photoHotspotY: 28,
     physicalLocation: "Threaded directly into the plastic drain cock on the very bottom of the diesel fuel filter canister.",
     visualIdentifier: "2-pin black connector pigtail emerging from the bottom wing-nut drain plug of the fuel filter.",
     accessTips: "Passenger side firewall / inner fender near brake booster.",
@@ -259,7 +325,11 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     shortCode: "ADD-SW",
     zone: "Drivetrain & Undercarriage",
     x: 48,
-    y: 72,
+    y: 65,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Front IFS Axle Tube (Driver Side of Differential Carrier)",
+    photoHotspotX: 49,
+    photoHotspotY: 82,
     physicalLocation: "Threaded into the aluminum intermediate axle tube of the front IFS 7.5\" differential (Left/driver side of differential carrier).",
     visualIdentifier: "22mm hexagonal brass switch body with a 2-pin harness connector with corrugated loom.",
     accessTips: "Crawl underneath front skid plate. Look directly above the left front CV half-shaft flange.",
@@ -279,8 +349,12 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     name: "Coolant Temperature Gauge Sender (Instrument Cluster)",
     shortCode: "TEMP-GAUGE",
     zone: "Engine / Block Mounted",
-    x: 46,
-    y: 22,
+    x: 44,
+    y: 20,
+    photoUrl: "./reference/engine_bay.jpg",
+    photoTitle: "Left Cylinder Head (Between Injector #1 & #2)",
+    photoHotspotX: 38,
+    photoHotspotY: 48,
     physicalLocation: "Threaded into the left (intake) side of the cylinder head casting, situated between Cylinder #1 and #2 glow plug ports.",
     visualIdentifier: "Small single-terminal brass sensor with a push-on plastic spade slide connector with rubber boot (OEM: 83420-16040).",
     accessTips: "Left side of cylinder head beneath the intake manifold.",
@@ -292,28 +366,6 @@ export const ELECTRICAL_LOCATOR_DATA: ElectricalComponentLocator[] = [
     failureSymptoms: [
       "Dashboard coolant temperature gauge needle is completely dead or pegged past hot",
       "If spade connector touches engine block, gauge needle immediately pegs to maximum hot"
-    ]
-  },
-  {
-    id: "main-fuse-box-engine",
-    name: "Main Engine Bay Fusible Link & Relay Center",
-    shortCode: "FUSE-ENG",
-    zone: "Engine Bay (Driver Side)",
-    x: 18,
-    y: 22,
-    physicalLocation: "Black plastic fuse box mounted on the driver's side inner fender, situated directly behind the main starting battery.",
-    visualIdentifier: "Rectangular black plastic cover embossed with 'FUSE & RELAY'. Contains the 80A GLOW bolt-down fusible link, 60A MAIN, and 30A HEAD fuses.",
-    accessTips: "Depress plastic side clips to unlatch cover. 80A fusible link is bolted down with two 8mm screws from underneath the bus bar.",
-    system: "Charging & Power",
-    connectorShape: "Screw Terminal Stud",
-    pins: [
-      { pinNumber: 1, label: "80A GLOW", wireColor: "W", wireColorFull: "White 8.0mm²", function: "Main feed for Glow Relay 1 & Relay 2", testCondition: "Constant", expectedVoltage: "12.6 V DC" },
-      { pinNumber: 2, label: "60A MAIN", wireColor: "W-R", wireColorFull: "White / Red 5.0mm²", function: "Main battery power feed to cabin ignition switch", testCondition: "Constant", expectedVoltage: "12.6 V DC" },
-      { pinNumber: 3, label: "30A HEAD", wireColor: "R-Y", wireColorFull: "Red / Yellow 3.0mm²", function: "Headlight and lighting circuit feed", testCondition: "Constant", expectedVoltage: "12.6 V DC" }
-    ],
-    failureSymptoms: [
-      "Completely dead vehicle with zero power to ignition switch (60A MAIN blown)",
-      "Zero power to glow plugs (80A GLOW blown after accidental short circuit on bus bar)"
     ]
   }
 ];
